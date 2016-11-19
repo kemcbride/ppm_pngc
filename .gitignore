@@ -1,0 +1,5 @@
+virtual_env/lib/*
+virtual_env/bin/*
+**.swp
+**.swo
+**.pyc
