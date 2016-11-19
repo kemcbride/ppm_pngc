@@ -1,0 +1,7 @@
+So we run hmmscan in order to like, "query a protein sequence against a database to search for a model for the sequence"
+So here's an example successfully running it - note that normal (human-readable) output goes to stdout, the terminal,
+and the option --tblout tells it to put table-output into the file we specify.
+
+You can always check out its help by doing "hmmscan -h" or "man hmmscan"
+
+hmmscan --cut_ga --tblout ~/Proteins/test_hmmscan.txt Xfam/Pfam-A.hmm ~/Proteins/PEP-mutase.faa

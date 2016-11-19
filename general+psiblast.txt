@@ -1,0 +1,47 @@
+## Notes on using psiblast
+
+- Basic usage
+psiblast -db [database] -query [input fasta query file path]
+
+- The default database is nr, so you don't need to include that option
+if you are making a query against nr.
+- Thus, a default query would be like:
+
+psiblast -query [input file]
+
+or 
+
+psiblast -query ~/Downloads/Ari_PngC.fasta
+
+
+- However, that will only output the results into your terminal. If you want
+to save your results, you've got to make the output (on stdout) go into a file.
+You can do this in 2 ways. (Well, you can probably do it in an infinite number of ways, but basically, 2)
+
+- You can either pipe directly to stdout, but you won't get any output in your terminal:
+
+psiblast [options] > [output file path]
+
+- Or, you can use the command/program "tee" which will print your output into your terminal
+as well as save it into a file:
+
+psiblast [options] | tee [output file path]
+
+
+- Remember! If you want to see the "help" for a command, there are kinda two ways.
+
+man [command/program name] is the standard linux/unix way. 
+
+[command/program name] --help
+[command/program name] -help
+
+- That's the other way, which is more specific to the command. Psiblast only supports -help.
+
+- Remember also, that when you generally call for help using --help or -help or man,
+they will just go straight to your terminal and you won't be able to scroll through.
+
+So really, you'll want to do:
+
+[command/program name] --help | less
+
+So that you can scroll through it and read it as you like.

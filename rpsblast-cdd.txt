@@ -1,0 +1,42 @@
+So far, the best bet we have for querying like, CDD, is using RPS-blast.
+We don't really know how to read the output, so you should experiment with adding ALL POSSIBLE fields and examining the output.
+Remember, you can check the output with "rpsblast -help" and pipe it into less or a file so you can look at it however you like.
+
+*** NOTE: also, you need to be in directory: /research/gmh/GENOME_DB/cddDB
+****: it might be cddDb or like some other case; but it defs starts with cdd and ends with db
+
+rpsblast -query ~/Proteins/PngC.faa -db cdd -outfmt "7 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore stitle sscinames scomnames" > ~/Proteins/test_rpsblast_with_stitle.txt
+
+* Here is an example of running rpsblast while using my sample fmt file 
+to create a custom tabular format.
+
+rpsblast -query ~/Proteins/PngC.faa -db cdd -outfmt "$(cat ~/rpsblast_fmt)" > ~/Proteins/test_rpsblast_with_stitle.txt
+
+
+Breakdown of your dear command:
+
+[command name]
+rpsblast
+
+[options]
+-query [queryfilepath] -db cdd
+
+[more complex way to specify a long option]
+[
+ the $(cat [filepath]) runs the command inside the parentheses-
+ in this case, that command is cat which just prints the content of [filepath]
+]
+-outfmt "$(cat [filepath])"
+
+[pipe your stdout/output into a filepath? (optional)]
+[
+ - remember! in general, make sure that your filepaths are ABSOLUTE, ie.
+ only in reference to either "/" (root) or "~" (your home directory)
+ this way, you will always know where to find the files you made
+]
+> [outputfilepath]
+
+So now that you have these parts,
+those are what comprise a normal command.
+[command name] [options] [maybe complex options?] [piping output]
+rpsblast -query ~/Proteins/PngC.faa -db cdd -outfmt "7" > ~/Proteins/test.txt
