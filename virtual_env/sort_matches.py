@@ -1,8 +1,8 @@
 from __future__ import print_function
 import os
+from util import *
 
 DATAPATH = '/Vagabundo/monica/temp/CUTGA-OUT-faa-{}'
-SETNAME = 'Complete' # Or Complete
 OUTPUTPATH = '/Vagabundo/monica/Proteins/'
 PEP_MUTASE_MATCH_LIST =['PEP_mutase']
 PNGC_MATCH_LIST =['NTP_transferase', 'NTP_transf_3', 'IspD']

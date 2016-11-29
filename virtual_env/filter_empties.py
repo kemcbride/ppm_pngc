@@ -1,4 +1,6 @@
+# coding: utf-8
 import os
+from util import *
 
 OUTPUTPATH = '/Vagabundo/monica/temp/CUTGA-OUT-faa-{}'
 SETNAME = 'Complete' # Or SCAFFOLD

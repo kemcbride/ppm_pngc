@@ -5,16 +5,9 @@
 from __future__ import print_function
 import os, multiprocessing
 from subprocess import call
+from util import *
 
-# Constants for now
-TEMP_PATH ='/Vagabundo/monica/temp/'
-DB_NAME = 'faa-Complete/'
-OUTPUT_DIR ='CUTGA-OUT-{}/'.format(DB_NAME)
-ZIP_PATH = '/research/gmh/GENOME_DB/{}/'.format(DB_NAME)
-HMM_FILE = '/Vagabundo/monica/Proteins/models.hmm'
-MULTIPROCESSING_FACTOR = 100 # We'll run 100 per batch
 DEVNULL = open('/dev/null', 'w')
-
 
 def run_hmmscan(f):
     fname = f.split('.')[0]
