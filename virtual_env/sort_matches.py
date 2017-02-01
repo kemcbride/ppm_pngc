@@ -48,10 +48,10 @@ def sort_matches():
     pngc_set = set(pngc_list)
     pepmutase_set = set(pepmutase_list)
     both = pngc_set & pepmutase_set
-    exclusive_pepmutase = pepmutase_set - pngc_set
-    exclusive_pngc = pngc_set - pepmutase_set
+    #exclusive_pepmutase = pepmutase_set - pngc_set
+    #exclusive_pngc = pngc_set - pepmutase_set
 
-    for name, fileset in [('both', both), ('pepmutase_only', exclusive_pepmutase), ('pngc_only', exclusive_pngc)]:
+    for name, fileset in [('both', both), ('pepmutase', pepmutase_set), ('pngc', pngc_set)]:
         with open(os.path.join(OUTPUTPATH, '{}_{}_matches.txt'.format(name, SETNAME)), 'w') as out:
             for filename in fileset:
                 out.write(filename + '\n')
