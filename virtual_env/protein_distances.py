@@ -9,8 +9,8 @@ import ipdb # This is a cool import - if you put the line ipdb.set_trace() in yo
 # and see what their values are. IT's really useful. you can quit with 'q' and continue the program with 'c' or next line with 'n'
 
 # I'm assuming that we'll just know what the file paths we want are:
-INPUT_PATH = ''
-GFF_PATH = ''
+INPUT_PATH = '/Vagabundo/monica/temp/70-CUTGA-OUT-faa-Complete'
+GFF_PATH = '/research/gmh/GENOME_DB/gff-Complete'
 COLS = ['target_name', 't_accession', 'tlen', 'query_name', 'q_accession', 'qlen', 'e_full', 'score_full', 'bias_full', 'num_domain', 'of_domain', 'ie_domain', 'score_domain', 'bias_domain', 'from_hmm', 'to_hmm', 'from_ali', 'to_ali', 'from_env', 'to_env', 'acc', 'desc_target']
 
 def parse_lastcol(col_text):
