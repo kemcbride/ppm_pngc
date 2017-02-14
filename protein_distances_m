@@ -8,8 +8,9 @@ ipdb.set_trace()
 #ipdb.set_trace() opens a debugger where you can type in variables and see values. Quit with 'q' and continue program$
 
 #file paths
-INPUT_PATH = '/Vagabundo/monica/temp/70-CUTGA-OUT-faa-Complete'
-GFF_Path = '/research/gmh/GENOME_DB/gff-Complete'
+INPUT_PATH = '/Vagabundo/monica/temp/70-CUTGA-OUT-faa-Complete/GCF_001293165.out'
+GFF_Path = '/research/gmh/GENOME_DB/gff-Complete/GCF_001293165.gff.gz'
+#GFF_Path = '/Vagabundo/monica/Proteins/GCF_001293165.gff'
 COLS = ['target name', 't_accession', 'tlen', 'query_name', 'q_accession', 'qlen', 'e_full', 'score_full', 'bias_full$
 
 def parse_lastcol(col_text):
