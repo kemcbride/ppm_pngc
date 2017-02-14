@@ -1,0 +1,69 @@
+#program to measure distances between pngc+ppm
+#based on a certain .out file (from 70-CUT-GA output)
+
+#imports
+import pandas as pd
+import ipdb
+ipdb.set_trace()
+#ipdb.set_trace() opens a debugger where you can type in variables and see values. Quit with 'q' and continue program$
+
+#file paths
+INPUT_PATH = '/Vagabundo/monica/temp/70-CUTGA-OUT-faa-Complete'
+GFF_Path = '/research/gmh/GENOME_DB/gff-Complete'
+COLS = ['target name', 't_accession', 'tlen', 'query_name', 'q_accession', 'qlen', 'e_full', 'score_full', 'bias_full$
+
+def parse_lastcol(col_text):
+    data = col_text.split(';')
+    data = [segment.split('=') for segment in data]
+    data = {segment[0]: segment[1] for segment in data}
+    #so now data = {key:value for a=b; y=z in col_text}
+    #we've turned col_text into a python dictionary
+    return data
+    #key = protein, variable = gene
+
+def main():
+    #load the input file as a dataframe
+    import os
+    input_df = pd.read_csv(os.path.join(INPUT_PATH),
+    comment = '#',
+    header = None,
+    delimiter = '\s+',
+    usecols = range (23)
+    )
+
+    input_df.columns = COLS
+
+    #only care about 'query_name' column
+    query_names = input_df['query_name']
+
+    #create a list of tuples/lists for each permutation/pair in query_names
+    permutations = []
+    for item in query_names:
+        for other_item in query_names:
+            if item != other_item:
+                permutations += (item, other_item)
+
+    #look at gff file
+    #if it loads and is weird, might need to set usecols or change deliminter to '\t'
+    gff_df = pd.read_csv(os.path.join(GFF_PATH),
+        comment = '#',
+        header = None,
+        delimiter = '\s+',
+        )
+
+    #the second column, we only care about the rows where the second column = 'Protein'
+    gff_df = gff_df['2' == 'Protein']
+
+    #Want to parse out the parent gene number
+    #Figure out how to get the last_col to be what you want
+    last_col = gff_df[-1]
+    last_col.apply(parse_lastcol)
+
+    #Then turn the keys/values from last_col into additional columns on gff_df
+    #Then find the ones where the 'name' from last_col data == 'WP_xyz' that you want
+    #And then for those columns, subtract for the corresponding pairs in the permutations list
+
+if __name__ == '__main__':
+    main()
+
+
