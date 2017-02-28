@@ -22,8 +22,6 @@ def parse_lastcol(col_text):
     data = col_text.split(';')
     data = [segment.split('=') for segment in data]
     data = {segment[0]:segment[1] for segment in data}
-    # So now data = {key:value for a=b;y=z in col_text
-    # We've turned col_text into a python dictionary
     return data
 
 
@@ -57,7 +55,6 @@ def main():
     last_col = gff_df[gff_df.columns[-1]]
     last_col_data = last_col.apply(parse_lastcol)
 
-    # Then... ideally, you'd turn the keys/values from last_col into additional columns on gff_df
     new_dict = defaultdict(list)
     first_keys = []
     for el in last_col_data:
@@ -70,26 +67,15 @@ def main():
     gff_df['parent_gene'] = [int(filter(type(seq).isdigit, seq)) for seq in parent_genes]
     gff_df['protein_id'] = protein_ids
 
-
-    # Then, you'd find the ones where the 'name' from last_col data == 'WP_xyz' that you want
-    # And then for thsoe columns, you'd do the subtraction for the corresponding pairs
-    # in the permutations list
     results = []
     for pair in permutations:
-
         left = gff_df[gff_df.protein_id == pair[0][0]]
         right = gff_df[gff_df.protein_id == pair[1][0]]
 
-        cols = [3, 4]
-        # We can hopefully assume they are not overlapping
-        lbegin = left.get_value(left.index[0], cols[0])
-        lend = left.get_value(left.index[0], cols[1])
-        rbegin = right.get_value(right.index[0], cols[0])
-        rend = right.get_value(right.index[0], cols[1])
+        lpos = left.get_value(left.index[0], 'parent_gene')
+        rpos = right.get_value(right.index[0], 'parent_gene')
+        distance = abs(lpos - rpos)
 
-        # Don't wanna figure out which one comes first in the gene - we'll assume
-        # that the distance is the smaller of these two.
-        distance = min([abs(lend-rbegin), abs(lbegin-rend)])
         results.append((pair, distance))
 
     for r in results:
