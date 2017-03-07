@@ -8,6 +8,7 @@ import os
 from StringIO import StringIO
 from collections import defaultdict
 import itertools
+import zipfile
 
 # I'm assuming that we'll just know what the file paths we want are:
 INPUT_PATH = '/Vagabundo/monica/temp/70-CUTGA-OUT-faa-Complete'
@@ -17,7 +18,10 @@ COLS = ['target_name', 't_accession', 'tlen', 'query_name', 'q_accession', 'qlen
 GFF_PATH = '/home/kelly/Dropbox/Stuff/MSc/GCF_000439255.gff'
 INPUT_PATH = '/home/kelly/Dropbox/Stuff/MSc/GCF_000439255.out'
 
-
+# Reading all the zipped files in gff-Complete
+for fname in os.listdir(GFF_PATH):
+    with zipfile.Zipfile(os.path.join(GFF_PATH, fname, 'r')):
+        
 def parse_lastcol(col_text):
     data = col_text.split(';')
     data = [segment.split('=') for segment in data]
