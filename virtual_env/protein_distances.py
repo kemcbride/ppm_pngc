@@ -9,14 +9,15 @@ from StringIO import StringIO
 from collections import defaultdict
 import itertools
 import gzip
+import ipdb
 
 # I'm assuming that we'll just know what the file paths we want are:
 INPUT_PATH = '/Vagabundo/monica/temp/70-CUTGA-OUT-faa-Complete'
 GFF_PATH = '/research/gmh/GENOME_DB/gff-Complete'
 COLS = ['target_name', 't_accession', 'tlen', 'query_name', 'q_accession', 'qlen', 'e_full', 'score_full', 'bias_full', 'num_domain', 'of_domain', 'ie_domain', 'score_domain', 'bias_domain', 'from_hmm', 'to_hmm', 'from_ali', 'to_ali', 'from_env', 'to_env', 'acc', 'desc_target']
 
-GFF_PATH = '/home/kelly/Dropbox/Stuff/MSc/'
-INPUT_PATH = '/home/kelly/Dropbox/Stuff/MSc/GCF_000439255.out'
+# FOR TESTING ON DIGITAL OCEAN
+GFF_PATH = '/root/msc/'
         
 def parse_lastcol(col_text):
     data = col_text.split(';')
@@ -47,7 +48,7 @@ def main():
         with gzip.GzipFile(os.path.join(GFF_PATH, fname), 'r') as gff_file:
             gff_text = gff_file.read()
         gff_lines = [line for line in gff_text.split('\n') if 'Protein' in line]
-        gff_lines = [line for line in gff_text.split('\n') if 'protein_id' in line]
+        gff_lines = [line for line in gff_lines if 'protein_id' in line]
         gff_text = '\n'.join(gff_lines)
 
         gff_df = pd.read_csv(StringIO(gff_text),
@@ -67,7 +68,7 @@ def main():
             for k, v in el.items():
                 new_dict[k].append(v)
 
-        parent_genes, protein_ids = new_dict['Parent'], new_dict['protein_id']
+        parent_genes, protein_ids = new_dict['Parent'], new_dict['Name']
         gff_df['parent_gene'] = [int(filter(type(seq).isdigit, seq)) for seq in parent_genes]
         gff_df['protein_id'] = protein_ids
 
