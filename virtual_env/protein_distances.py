@@ -34,7 +34,7 @@ def main():
         input_fname = fname.split('.')[0] + '.out'
         #DIS DA PART TO IGNORE UNMATCHED GFF FILES
         try:
-            input_df = pd.read_csv(os.path.join(os.path.join(GFF_PATH, input_fname)),
+            input_df = pd.read_csv(os.path.join(os.path.join(INPUT_PATH, input_fname)),
                 comment='#',
                 header=None,
                 delimiter='\s+',
