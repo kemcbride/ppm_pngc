@@ -30,14 +30,18 @@ def main():
     # Reading all the zipped files in gff-Complete
     gff_gzips = [f for f in os.listdir(GFF_PATH) if f.endswith('.gz')]
     for fname in gff_gzips:
-        # Load the input file as a dataframe.
+        # Load the input file as a dataframe
         input_fname = fname.split('.')[0] + '.out'
-        input_df = pd.read_csv(os.path.join(os.path.join(GFF_PATH, input_fname)),
-            comment='#',
-            header=None,
-            delimiter='\s+',
-            usecols=range(22)
-            )
+        #DIS DA PART TO IGNORE UNMATCHED GFF FILES
+        try:
+            input_df = pd.read_csv(os.path.join(os.path.join(GFF_PATH, input_fname)),
+                comment='#',
+                header=None,
+                delimiter='\s+',
+                usecols=range(22)
+                )
+        except:
+                pass
         input_df.columns = COLS
         # We only care about the 'query_name' column - this might not be the right way of getting it, whatever. Idk.
         query_names = input_df[['query_name', 'target_name']]
