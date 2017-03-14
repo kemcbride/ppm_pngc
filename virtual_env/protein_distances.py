@@ -16,8 +16,6 @@ INPUT_PATH = '/Vagabundo/monica/temp/70-CUTGA-OUT-faa-Complete'
 GFF_PATH = '/research/gmh/GENOME_DB/gff-Complete'
 COLS = ['target_name', 't_accession', 'tlen', 'query_name', 'q_accession', 'qlen', 'e_full', 'score_full', 'bias_full', 'num_domain', 'of_domain', 'ie_domain', 'score_domain', 'bias_domain', 'from_hmm', 'to_hmm', 'from_ali', 'to_ali', 'from_env', 'to_env', 'acc', 'desc_target']
 
-# FOR TESTING ON DIGITAL OCEAN
-GFF_PATH = '/root/msc/'
         
 def parse_lastcol(col_text):
     data = col_text.split(';')
@@ -30,36 +28,37 @@ def main():
     # Reading all the zipped files in gff-Complete
     gff_gzips = [f for f in os.listdir(GFF_PATH) if f.endswith('.gz')]
     for fname in gff_gzips:
-        # Load the input file as a dataframe
-        input_fname = fname.split('.')[0] + '.out'
-        #DIS DA PART TO IGNORE UNMATCHED GFF FILES
         try:
+            # Load the input file as a dataframe
+            input_fname = fname.split('.')[0] + '.out'
+            #DIS DA PART TO IGNORE UNMATCHED GFF FILES
             input_df = pd.read_csv(os.path.join(os.path.join(INPUT_PATH, input_fname)),
                 comment='#',
                 header=None,
                 delimiter='\s+',
                 usecols=range(22)
                 )
-        except:
-                pass
-        input_df.columns = COLS
-        # We only care about the 'query_name' column - this might not be the right way of getting it, whatever. Idk.
-        query_names = input_df[['query_name', 'target_name']]
+            input_df.columns = COLS
+            # We only care about the 'query_name' column - this might not be the right way of getting it, whatever. Idk.
+            query_names = input_df[['query_name', 'target_name']]
 
-        permutations = itertools.permutations(query_names.values, 2)
+            permutations = itertools.permutations(query_names.values, 2)
 
-        # Load the GFF file
-        with gzip.GzipFile(os.path.join(GFF_PATH, fname), 'r') as gff_file:
-            gff_text = gff_file.read()
-        gff_lines = [line for line in gff_text.split('\n') if 'Protein' in line]
-        gff_lines = [line for line in gff_lines if 'protein_id' in line]
-        gff_text = '\n'.join(gff_lines)
+            # Load the GFF file
+            with gzip.GzipFile(os.path.join(GFF_PATH, fname), 'r') as gff_file:
+                gff_text = gff_file.read()
+            gff_lines = [line for line in gff_text.split('\n') if 'Protein' in line]
+            gff_lines = [line for line in gff_lines if 'protein_id' in line]
+            gff_text = '\n'.join(gff_lines)
 
-        gff_df = pd.read_csv(StringIO(gff_text),
-            comment='#',
-            header=None,
-            delimiter='\t',
-            )
+            gff_df = pd.read_csv(StringIO(gff_text),
+                comment='#',
+                header=None,
+                delimiter='\t',
+                )
+        except Exception as e:
+            print(e)
+            continue
 
         last_col = gff_df[gff_df.columns[-1]]
         last_col_data = last_col.apply(parse_lastcol)
