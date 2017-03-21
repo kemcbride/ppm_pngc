@@ -25,9 +25,9 @@ def parse_lastcol(col_text):
 
 
 def main():
-    # Reading all the zipped files in gff-Complete
-    gff_gzips = [f for f in os.listdir(GFF_PATH) if f.endswith('.gz')]
-    for fname in gff_gzips:
+    # Reading all the .out files in gff-Complete
+    out_files = [f for f in os.listdir(INPUT_PATH) if f.endswith('.out')]
+    for fname in out_files:
         try:
             # Load the input file as a dataframe
             input_fname = fname.split('.')[0] + '.out'
