@@ -96,3 +96,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# (0,1)
+# (pair, distance)
+# ((target,query), (target,query), (distance))
