@@ -26,7 +26,7 @@ def parse_lastcol(col_text):
 
 def main():
     # Reading all the .out files in gff-Complete
-    out_files = [f for f in os.listdir(INPUT_PATH) if f.endswith('.out')]
+    out_files = os.listdir(INPUT_PATH)
     for fname in out_files:
         try:
             # Load the input file as a dataframe
@@ -45,7 +45,8 @@ def main():
             permutations = itertools.permutations(query_names.values, 2)
 
             # Load the GFF file
-            with gzip.GzipFile(os.path.join(GFF_PATH, fname), 'r') as gff_file:
+            gff_fname = fname.split('.')[0] + '.gff.gz'
+            with gzip.GzipFile(os.path.join(GFF_PATH, gff_fname), 'r') as gff_file:
                 gff_text = gff_file.read()
             gff_lines = [line for line in gff_text.split('\n') if 'Protein' in line]
             gff_lines = [line for line in gff_lines if 'protein_id' in line]
