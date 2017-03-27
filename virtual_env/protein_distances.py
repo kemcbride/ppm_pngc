@@ -51,7 +51,16 @@ def main():
             gff_lines = [line for line in gff_text.split('\n') if 'Protein' in line]
             gff_lines = [line for line in gff_lines if 'protein_id' in line]
             gff_text = '\n'.join(gff_lines)
-
+            
+            # Okay so this is super tricky I realize but this is what we need to figure out: 
+            # So we open up the gff file, but we aren't only concerned with the "Protein" line
+            # Basically, we need to look at the first column (NZ_CP01...) and AFTER we locate where the two genes are,
+            # we need to check that they belong to the same "DNA" which is indicated by the first column identifier
+            # So it's like Step #1 use Name= in that line to find both the genes
+            # Step #2 find the identifier (from column 1) for gene #1 and then gene #2
+            # If identifiers are = then continue process, find distances, record that shiz
+            # If identifiers =/= then skip these genes because they are not from the same DNA, we don't care about it
+            # The tricky part is that we can't do that line split thing with only looking at the lines with "Protein" in it because it's every single line we check
             gff_df = pd.read_csv(StringIO(gff_text),
                 comment='#',
                 header=None,
