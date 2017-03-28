@@ -87,25 +87,35 @@ def main():
 
         results = []
         for pair in permutations:
+            # We select 'left' and 'right' pair members based on whether they match
+            # the target and query names of the pair that we have from input_df
             left = gff_df[gff_df.protein_id == pair[0][0]]
             right = gff_df[gff_df.protein_id == pair[1][0]]
+
+            # Here we do .values[0][0] - values means we care only about the values,
+            # not about the "dataframe", the first [0] indicates the first row of the
+            # dataframe, and the second [0] indicates the first column (the DNA name?)
+            if left.values[0][0] != right.values[0][0]:
+                continue
 
             lpos = left.get_value(left.index[0], 'parent_gene')
             rpos = right.get_value(right.index[0], 'parent_gene')
             distance = abs(lpos - rpos)
-
+            if distance == 0:
+                continue
             results.append((pair, distance))
 
         print(fname)
         print('\n')
         for r in results:
-            if r[0][1][1] != r[0][0][1]:
-                print(r[0][1][1], r[0][0][1], r[1])
+            # r looks like ( (left_dataframe, right_dataframe), distance )
+            left = r[0][0]
+            right = r[0][1]
+            distance = r[1]
+            # Left[1], Right[1]
+            if left[1] != right[1]:
+                print('{} {} {}'.format(left[1], right[1], distance))
         print('\n')
 
 if __name__ == '__main__':
     main()
-
-# (0,1)
-# (pair, distance)
-# ((target,query), (target,query), (distance))
