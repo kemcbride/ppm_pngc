@@ -114,7 +114,7 @@ def main():
             distance = r[1]
             # Left[1], Right[1]
             if left[1] != right[1]:
-                print('{} {} {}'.format(left[1], right[1], distance))
+                print(','.join([str(left[1]), str(right[1]), str(distance)]))
         print('\n')
 
 if __name__ == '__main__':
