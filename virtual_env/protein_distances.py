@@ -25,9 +25,9 @@ def parse_lastcol(col_text):
 
 
 def main():
-    # Reading all the zipped files in gff-Complete
-    gff_gzips = [f for f in os.listdir(GFF_PATH) if f.endswith('.gz')]
-    for fname in gff_gzips:
+    # Reading all the .out files in gff-Complete
+    out_files = os.listdir(INPUT_PATH)
+    for fname in out_files:
         try:
             # Load the input file as a dataframe
             input_fname = fname.split('.')[0] + '.out'
@@ -45,12 +45,22 @@ def main():
             permutations = itertools.permutations(query_names.values, 2)
 
             # Load the GFF file
-            with gzip.GzipFile(os.path.join(GFF_PATH, fname), 'r') as gff_file:
+            gff_fname = fname.split('.')[0] + '.gff.gz'
+            with gzip.GzipFile(os.path.join(GFF_PATH, gff_fname), 'r') as gff_file:
                 gff_text = gff_file.read()
             gff_lines = [line for line in gff_text.split('\n') if 'Protein' in line]
             gff_lines = [line for line in gff_lines if 'protein_id' in line]
             gff_text = '\n'.join(gff_lines)
-
+            
+            # Okay so this is super tricky I realize but this is what we need to figure out: 
+            # So we open up the gff file, but we aren't only concerned with the "Protein" line
+            # Basically, we need to look at the first column (NZ_CP01...) and AFTER we locate where the two genes are,
+            # we need to check that they belong to the same "DNA" which is indicated by the first column identifier
+            # So it's like Step #1 use Name= in that line to find both the genes
+            # Step #2 find the identifier (from column 1) for gene #1 and then gene #2
+            # If identifiers are = then continue process, find distances, record that shiz
+            # If identifiers =/= then skip these genes because they are not from the same DNA, we don't care about it
+            # The tricky part is that we can't do that line split thing with only looking at the lines with "Protein" in it because it's every single line we check
             gff_df = pd.read_csv(StringIO(gff_text),
                 comment='#',
                 header=None,
@@ -77,20 +87,34 @@ def main():
 
         results = []
         for pair in permutations:
+            # We select 'left' and 'right' pair members based on whether they match
+            # the target and query names of the pair that we have from input_df
             left = gff_df[gff_df.protein_id == pair[0][0]]
             right = gff_df[gff_df.protein_id == pair[1][0]]
+
+            # Here we do .values[0][0] - values means we care only about the values,
+            # not about the "dataframe", the first [0] indicates the first row of the
+            # dataframe, and the second [0] indicates the first column (the DNA name?)
+            if left.values[0][0] != right.values[0][0]:
+                continue
 
             lpos = left.get_value(left.index[0], 'parent_gene')
             rpos = right.get_value(right.index[0], 'parent_gene')
             distance = abs(lpos - rpos)
-
+            if distance == 0:
+                continue
             results.append((pair, distance))
 
         print(fname)
         print('\n')
         for r in results:
-            if r[0][1][1] != r[0][0][1]:
-                print(r[0][1][1], r[0][0][1], r[1])
+            # r looks like ( (left_dataframe, right_dataframe), distance )
+            left = r[0][0]
+            right = r[0][1]
+            distance = r[1]
+            # Left[1], Right[1]
+            if left[1] != right[1]:
+                print(','.join([str(left[1]), str(right[1]), str(distance)]))
         print('\n')
 
 if __name__ == '__main__':
