@@ -29,7 +29,7 @@ def main():
     out_files = os.listdir(INPUT_PATH)
     for fname in out_files:
         try:
-            input_df = pd.read_csv(os.path.join(INPUT_PATH, input_fname),
+            input_df = pd.read_csv(os.path.join(INPUT_PATH, fname),
                 comment='#',
                 header=None,
                 delimiter='\s+',
