@@ -29,10 +29,7 @@ def main():
     out_files = os.listdir(INPUT_PATH)
     for fname in out_files:
         try:
-            # Load the input file as a dataframe
-            input_fname = fname.split('.')[0] + '.out'
-            #DIS DA PART TO IGNORE UNMATCHED GFF FILES
-            input_df = pd.read_csv(os.path.join(os.path.join(INPUT_PATH, input_fname)),
+            input_df = pd.read_csv(os.path.join(INPUT_PATH, input_fname),
                 comment='#',
                 header=None,
                 delimiter='\s+',
