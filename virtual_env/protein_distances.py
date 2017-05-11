@@ -21,6 +21,9 @@ def parse_lastcol(col_text):
     data = col_text.split(';')
     data = [segment.split('=') for segment in data]
     data = {segment[0]:segment[1] for segment in data}
+    # Breaking the last column of the GFF file into segments that we care about i.e. Parent=gene14
+    # So now data = {key:value for a=b;y=z} in col_text
+    # We've turned col_text into a python dictionary
     return data
 
 
@@ -38,37 +41,32 @@ def main():
             input_df.columns = COLS
             # We only care about the 'query_name' column - this might not be the right way of getting it, whatever. Idk.
             query_names = input_df[['query_name', 'target_name']]
-
+    # We are matching the target name (i.e. PEP_mutase) with the query name (i.e. WP_05123543.01) 
             permutations = itertools.permutations(query_names.values, 2)
 
             # Load the GFF file
             gff_fname = fname.split('.')[0] + '.gff.gz'
             with gzip.GzipFile(os.path.join(GFF_PATH, gff_fname), 'r') as gff_file:
                 gff_text = gff_file.read()
+            gff_lines = [line for line in gff_text.split('\n') if 'CDS' in line]
             gff_lines = [line for line in gff_text.split('\n') if 'Protein' in line]
             gff_lines = [line for line in gff_lines if 'protein_id' in line]
             gff_text = '\n'.join(gff_lines)
-            
-            # Okay so this is super tricky I realize but this is what we need to figure out: 
-            # So we open up the gff file, but we aren't only concerned with the "Protein" line
-            # Basically, we need to look at the first column (NZ_CP01...) and AFTER we locate where the two genes are,
-            # we need to check that they belong to the same "DNA" which is indicated by the first column identifier
-            # So it's like Step #1 use Name= in that line to find both the genes
-            # Step #2 find the identifier (from column 1) for gene #1 and then gene #2
-            # If identifiers are = then continue process, find distances, record that shiz
-            # If identifiers =/= then skip these genes because they are not from the same DNA, we don't care about it
-            # The tricky part is that we can't do that line split thing with only looking at the lines with "Protein" in it because it's every single line we check
+            # Only interested in the lines containing gene# and the protein_id
             gff_df = pd.read_csv(StringIO(gff_text),
                 comment='#',
                 header=None,
                 delimiter='\t',
                 )
+
         except Exception as e:
             print(e)
             continue
 
         last_col = gff_df[gff_df.columns[-1]]
         last_col_data = last_col.apply(parse_lastcol)
+        # Only looking at the last column in the GFF file
+        # Then... ideally, you'd turn the keys/values from last_col into additional columns on gff_df
 
         new_dict = defaultdict(list)
         first_keys = []
@@ -81,6 +79,9 @@ def main():
         parent_genes, protein_ids = new_dict['Parent'], new_dict['Name']
         gff_df['parent_gene'] = [int(filter(type(seq).isdigit, seq)) for seq in parent_genes]
         gff_df['protein_id'] = protein_ids
+    # 'Parent' gives us the gene number we care about and 'Name' is the identifier
+    # Then, we find the ones where the 'name' from last_col data == 'WP_xyz'
+    # And then for thsoe columns, we subtract for the corresponding pairs to get the gene distance using permutations
 
         results = []
         for pair in permutations:
@@ -111,7 +112,7 @@ def main():
             distance = r[1]
             # Left[1], Right[1]
             if left[1] != right[1]:
-                print(','.join([str(left[1]), str(right[1]), str(distance)]))
+                print(','.join([str(left[1]), str(left[0]), str(right[1]), str(right[0]), str(distance)]))
         print('\n')
 
 if __name__ == '__main__':
