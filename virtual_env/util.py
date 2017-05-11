@@ -7,6 +7,10 @@ TEMP_PATH ='/Vagabundo/monica/temp/'
 OUTPUT_DIR ='CUTGA-OUT-{}'.format(DB_NAME)
 ZIP_PATH = os.path.join('/research/gmh/GENOME_DB/{}', DB_NAME)
 
+# From/for sort_matches.py and protein_distances.py
+PPM_MATCH_LIST =['PEP_mutase']
+PNGC_MATCH_LIST =['NTP_transferase', 'NTP_transf_3', 'IspD']
+
 HMM_FILE = '/Vagabundo/monica/Proteins/models.hmm'
 
 MULTIPROCESSING_FACTOR = 100 # We'll run 100 per batch

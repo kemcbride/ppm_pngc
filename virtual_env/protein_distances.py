@@ -1,21 +1,23 @@
 # Some kind of program to measure distances between proteins that have hits
 # based on a certain .out file (70-cutga-out output.)
-#
 
-# Do your imports
 import pandas as pd
 import os
 from StringIO import StringIO
 from collections import defaultdict
 import itertools
 import gzip
-import ipdb
+
+# Lists of the protein names that are PNGC or PEP_MUTASE
+from util import PPM_MATCH_LIST, PNGC_MATCH_LIST
 
 # I'm assuming that we'll just know what the file paths we want are:
 INPUT_PATH = '/Vagabundo/monica/temp/70-CUTGA-OUT-faa-Complete'
 GFF_PATH = '/research/gmh/GENOME_DB/gff-Complete'
 COLS = ['target_name', 't_accession', 'tlen', 'query_name', 'q_accession', 'qlen', 'e_full', 'score_full', 'bias_full', 'num_domain', 'of_domain', 'ie_domain', 'score_domain', 'bias_domain', 'from_hmm', 'to_hmm', 'from_ali', 'to_ali', 'from_env', 'to_env', 'acc', 'desc_target']
 
+INPUT_PATH = '/home/kelly/Dropbox/Stuff/MSc'
+GFF_PATH = INPUT_PATH
         
 def parse_lastcol(col_text):
     data = col_text.split(';')
@@ -30,6 +32,7 @@ def parse_lastcol(col_text):
 def main():
     # Reading all the .out files in gff-Complete
     out_files = os.listdir(INPUT_PATH)
+    # print('
     for fname in out_files:
         try:
             input_df = pd.read_csv(os.path.join(INPUT_PATH, fname),
@@ -41,8 +44,16 @@ def main():
             input_df.columns = COLS
             # We only care about the 'query_name' column - this might not be the right way of getting it, whatever. Idk.
             query_names = input_df[['query_name', 'target_name']]
-    # We are matching the target name (i.e. PEP_mutase) with the query name (i.e. WP_05123543.01) 
-            permutations = itertools.permutations(query_names.values, 2)
+            # We are matching the target name (i.e. PEP_mutase) with the query name (i.e. WP_05123543.01) 
+
+            # Now we're only creating pairs between PPM and PNGC rows.
+            pep_mutase_rows = query_names.loc[
+                    query_names['target_name'].isin(PPM_MATCH_LIST)]
+            pngc_rows = query_names.loc[
+                    query_names['target_name'].isin(PNGC_MATCH_LIST)]
+            # Dataframe.values turns it into a list of lists, where each inner list is the row of data
+            # itertools.product does the cartesian product between the two sets.
+            pairs = itertools.product(pep_mutase_rows.values, pngc_rows.values)
 
             # Load the GFF file
             gff_fname = fname.split('.')[0] + '.gff.gz'
@@ -60,7 +71,7 @@ def main():
                 )
 
         except Exception as e:
-            print(e)
+            print('# {}'.format(e))
             continue
 
         last_col = gff_df[gff_df.columns[-1]]
@@ -84,7 +95,7 @@ def main():
     # And then for thsoe columns, we subtract for the corresponding pairs to get the gene distance using permutations
 
         results = []
-        for pair in permutations:
+        for pair in pairs:
             # We select 'left' and 'right' pair members based on whether they match
             # the target and query names of the pair that we have from input_df
             left = gff_df[gff_df.protein_id == pair[0][0]]
@@ -103,17 +114,16 @@ def main():
                 continue
             results.append((pair, distance))
 
-        print(fname)
-        print('\n')
+        print('# {}'.format(fname))
         for r in results:
             # r looks like ( (left_dataframe, right_dataframe), distance )
             left = r[0][0]
             right = r[0][1]
             distance = r[1]
-            # Left[1], Right[1]
             if left[1] != right[1]:
-                print(','.join([str(left[1]), str(left[0]), str(right[1]), str(right[0]), str(distance)]))
-        print('\n')
+                # This format string a - calls str() on each arg, and then
+                # formats it left-aligned with 20 spaces
+                print(''.join(map(lambda x: '{!s:<20}'.format(x), [left[1], left[0], right[1], right[0], distance])))
 
 if __name__ == '__main__':
     main()

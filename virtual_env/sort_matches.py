@@ -4,8 +4,6 @@ from util import *
 
 DATAPATH = '/Vagabundo/monica/temp/CUTGA-OUT-faa-{}'
 OUTPUTPATH = '/Vagabundo/monica/Proteins/'
-PEP_MUTASE_MATCH_LIST =['PEP_mutase']
-PNGC_MATCH_LIST =['NTP_transferase', 'NTP_transf_3', 'IspD']
 
 
 def sort_matches():
@@ -30,7 +28,7 @@ def sort_matches():
             while(not line.startswith('#') and not matched_both):
                 # All praise be to domtblout format for making this easy for us...
                 match_name = line.split()[0] # the first "word" of each line
-                if not matched_pepmutase and match_name in PEP_MUTASE_MATCH_LIST:
+                if not matched_pepmutase and match_name in PPM_MATCH_LIST:
                     pepmutase_list.append(datafile)
                     matched_pepmutase = True
                 elif not matched_pngc and match_name in PNGC_MATCH_LIST:
