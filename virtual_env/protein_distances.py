@@ -16,8 +16,9 @@ INPUT_PATH = '/Vagabundo/monica/temp/70-CUTGA-OUT-faa-Complete'
 GFF_PATH = '/research/gmh/GENOME_DB/gff-Complete'
 COLS = ['target_name', 't_accession', 'tlen', 'query_name', 'q_accession', 'qlen', 'e_full', 'score_full', 'bias_full', 'num_domain', 'of_domain', 'ie_domain', 'score_domain', 'bias_domain', 'from_hmm', 'to_hmm', 'from_ali', 'to_ali', 'from_env', 'to_env', 'acc', 'desc_target']
 
-INPUT_PATH = '/home/kelly/Dropbox/Stuff/MSc'
-GFF_PATH = INPUT_PATH
+# This format string a - calls str() on each arg, and then
+# formats it left-aligned with 20 spaces
+DATA_FMT = '{!s:<20}'
         
 def parse_lastcol(col_text):
     data = col_text.split(';')
@@ -30,9 +31,11 @@ def parse_lastcol(col_text):
 
 
 def main():
+    # Print the column names
+    print(''.join([DATA_FMT.format(colname) for colname in ['PPM', 'PNGC', 'Distance']]))
+
     # Reading all the .out files in gff-Complete
     out_files = os.listdir(INPUT_PATH)
-    # print('
     for fname in out_files:
         try:
             input_df = pd.read_csv(os.path.join(INPUT_PATH, fname),
@@ -41,8 +44,7 @@ def main():
                 delimiter='\s+',
                 usecols=range(22)
                 )
-            input_df.columns = COLS
-            # We only care about the 'query_name' column - this might not be the right way of getting it, whatever. Idk.
+            input_df.columns = COLS  # add the column names to the dataframe
             query_names = input_df[['query_name', 'target_name']]
             # We are matching the target name (i.e. PEP_mutase) with the query name (i.e. WP_05123543.01) 
 
@@ -71,14 +73,16 @@ def main():
                 )
 
         except Exception as e:
+            # idea: make all output that is non-relevant/useful a comment,
+            # so any code that reads the output files can ignore it
             print('# {}'.format(e))
             continue
 
         last_col = gff_df[gff_df.columns[-1]]
+        # this function turns the last column into a dictionary from its tag=value; format
         last_col_data = last_col.apply(parse_lastcol)
-        # Only looking at the last column in the GFF file
-        # Then... ideally, you'd turn the keys/values from last_col into additional columns on gff_df
 
+        # turn the keys/values from last_col into additional columns on gff_df
         new_dict = defaultdict(list)
         first_keys = []
         for el in last_col_data:
@@ -88,42 +92,39 @@ def main():
                 new_dict[k].append(v)
 
         parent_genes, protein_ids = new_dict['Parent'], new_dict['Name']
+        # This is a "fancy/annoying" way of turning string -> int, eg. "gene6" -> 6
         gff_df['parent_gene'] = [int(filter(type(seq).isdigit, seq)) for seq in parent_genes]
         gff_df['protein_id'] = protein_ids
-    # 'Parent' gives us the gene number we care about and 'Name' is the identifier
-    # Then, we find the ones where the 'name' from last_col data == 'WP_xyz'
-    # And then for thsoe columns, we subtract for the corresponding pairs to get the gene distance using permutations
+        # 'Parent' gives us the gene number we care about and 'Name' is the identifier
+        # Then, we find the ones where the 'name' from last_col data == 'WP_xyz'
+        # And then for thsoe columns, we subtract for the corresponding pairs
+        # to get the gene distance using pairs
 
         results = []
         for pair in pairs:
             # We select 'left' and 'right' pair members based on whether they match
             # the target and query names of the pair that we have from input_df
-            left = gff_df[gff_df.protein_id == pair[0][0]]
-            right = gff_df[gff_df.protein_id == pair[1][0]]
+            left = gff_df[gff_df.protein_id == pair[0][0]].iloc[0]
+            right = gff_df[gff_df.protein_id == pair[1][0]].iloc[0]
 
-            # Here we do .values[0][0] - values means we care only about the values,
-            # not about the "dataframe", the first [0] indicates the first row of the
-            # dataframe, and the second [0] indicates the first column (the DNA name?)
-            if left.values[0][0] != right.values[0][0]:
+            # '0' here referring to the first column in the GFF file - the DNA/gene id
+            # eg: NZ_xyzxyzxyz - if these are not from the same gene/DNA, skip it
+            if left[0] != right[0]:
                 continue
 
-            lpos = left.get_value(left.index[0], 'parent_gene')
-            rpos = right.get_value(right.index[0], 'parent_gene')
-            distance = abs(lpos - rpos)
-            if distance == 0:
-                continue
+            distance = abs(left.parent_gene - right.parent_gene)
             results.append((pair, distance))
 
         print('# {}'.format(fname))
         for r in results:
-            # r looks like ( (left_dataframe, right_dataframe), distance )
+            # r looks like ( (left_data, right_data), distance )
             left = r[0][0]
             right = r[0][1]
             distance = r[1]
             if left[1] != right[1]:
-                # This format string a - calls str() on each arg, and then
-                # formats it left-aligned with 20 spaces
-                print(''.join(map(lambda x: '{!s:<20}'.format(x), [left[1], left[0], right[1], right[0], distance])))
+                print(''.join(
+                    [DATA_FMT.format(x) for x in [left[0], right[0], distance]]
+                ))
 
 if __name__ == '__main__':
     main()
