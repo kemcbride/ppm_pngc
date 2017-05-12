@@ -1,7 +1,7 @@
-virtual_env/lib/*
-virtual_env/bin/*
-virtual_env/share/*
-virtual_env/include/*
+virtual_env/lib
+virtual_env/bin
+virtual_env/share
+virtual_env/include
 **.swp
 **.swo
 **.pyc
