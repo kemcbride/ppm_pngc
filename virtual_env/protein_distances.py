@@ -2,6 +2,7 @@
 # based on a certain .out file (70-cutga-out output.)
 
 import pandas as pd
+import sys
 import os
 from StringIO import StringIO
 from collections import defaultdict
@@ -36,6 +37,7 @@ def main():
 
     # Reading all the .out files in gff-Complete
     out_files = os.listdir(INPUT_PATH)
+    print >> sys.stderr, '\n'.join(out_files)
     for fname in out_files:
         try:
             input_df = pd.read_csv(os.path.join(INPUT_PATH, fname),
@@ -104,8 +106,12 @@ def main():
         for pair in pairs:
             # We select 'left' and 'right' pair members based on whether they match
             # the target and query names of the pair that we have from input_df
-            left = gff_df[gff_df.protein_id == pair[0][0]].iloc[0]
-            right = gff_df[gff_df.protein_id == pair[1][0]].iloc[0]
+            try:
+                left = gff_df[gff_df.protein_id == pair[0][0]].iloc[0]
+                right = gff_df[gff_df.protein_id == pair[1][0]].iloc[0]
+            except:
+                # print >> sys.stderr, 'HIT EXCEPTION IN PAIR PRINTING LOOP'
+                continue
 
             # '0' here referring to the first column in the GFF file - the DNA/gene id
             # eg: NZ_xyzxyzxyz - if these are not from the same gene/DNA, skip it
@@ -121,10 +127,9 @@ def main():
             left = r[0][0]
             right = r[0][1]
             distance = r[1]
-            if left[1] != right[1]:
-                print(''.join(
-                    [DATA_FMT.format(x) for x in [left[0], right[0], distance]]
-                ))
+            print(''.join(
+                [DATA_FMT.format(x) for x in [left[0], right[0], distance]]
+            ))
 
 if __name__ == '__main__':
     main()
