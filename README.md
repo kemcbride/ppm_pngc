@@ -3,14 +3,12 @@ PEP Mutase and PngC - code for Monika Papkinski's masters.
 
 ## TODO (specifically wrt. `protein_distances.py`)
 - actually factor code into functions (parse_lastcol is some kind of a start)
-- medium: fix exceptions (locally, i get lots of `Usecols do not match names.` and `[Errno 2] No such file or directory: '/home/kelly/Dropbox/Stuff/MSc/GCF_000832525.gff.gz'`, the second of which I think is benign
-- medium/easy: dedupe the PngC side of the output
+- medium: fix exceptions
 - medium: get it to only show the smallest distance per pep_mutase
 - make it so that we don't need to refer to any columns by number (stretch goal :P)
 - prefer/do pre-processing/filtering over post-processing - it's better and faster for us to compute less data overall (doi, i guess) even though it is annoying to preprocess some of these things...(or impossible, maybe)
 - easy probably?: use tabs instead of generic spaces in output (??)
 - catch more specific exceptions/get code to be safe enough to not need the big try/catch
-- easy: kill the line 96 annoyingly pretentious int creator line for `parent_gene`. literally im so sorry for writing it, just do something like `re.sub('gene', '')` idk, idc
 - easy: turn the path into an optional command line argument. (that way, you can specify scaffold/complete on the command line instead of writing a new file for it *staring intently*)
 
 
