@@ -37,7 +37,6 @@ def main():
 
     # Reading all the .out files in gff-Complete
     out_files = os.listdir(INPUT_PATH)
-    print >> sys.stderr, '\n'.join(out_files)
     for fname in out_files:
         try:
             input_df = pd.read_csv(os.path.join(INPUT_PATH, fname),
@@ -84,19 +83,10 @@ def main():
         # this function turns the last column into a dictionary from its tag=value; format
         last_col_data = last_col.apply(parse_lastcol)
 
-        # turn the keys/values from last_col into additional columns on gff_df
-        new_dict = defaultdict(list)
-        first_keys = []
-        for el in last_col_data:
-            if el == last_col_data[0]:
-                first_keys = el.keys()
-            for k, v in el.items():
-                new_dict[k].append(v)
-
-        parent_genes, protein_ids = new_dict['Parent'], new_dict['Name']
-        # This is a "fancy/annoying" way of turning string -> int, eg. "gene6" -> 6
-        gff_df['parent_gene'] = [int(filter(type(seq).isdigit, seq)) for seq in parent_genes]
-        gff_df['protein_id'] = protein_ids
+        # Use apply to ensure that the rows correspond properly, and if any lambda fails, it gets 'None'
+        # This is a bit more verbose, but it won't throw exceptions.
+        gff_df['parent_gene'] = last_col_data.apply(lambda s: int(s['Parent'].replace('gene', '')) if 'Parent' in s else None)
+        gff_df['protein_id'] = last_col_data.apply(lambda s: s.get('Name'))
         # 'Parent' gives us the gene number we care about and 'Name' is the identifier
         # Then, we find the ones where the 'name' from last_col data == 'WP_xyz'
         # And then for thsoe columns, we subtract for the corresponding pairs
@@ -107,28 +97,32 @@ def main():
             # We select 'left' and 'right' pair members based on whether they match
             # the target and query names of the pair that we have from input_df
             try:
-                left = gff_df[gff_df.protein_id == pair[0][0]].iloc[0]
-                right = gff_df[gff_df.protein_id == pair[1][0]].iloc[0]
-            except:
-                # print >> sys.stderr, 'HIT EXCEPTION IN PAIR PRINTING LOOP'
+                ppm_gff = gff_df[gff_df.protein_id == pair[0][0]].iloc[0]
+            except IndexError as e:
+                print('# Error - no matching ppm protein found in gff file: {}, {}'.format(pair[0], e))
+                continue
+            try:
+                pngc_gff = gff_df[gff_df.protein_id == pair[1][0]].iloc[0]
+            except IndexError as e:
+                print('# Error - no matching pngc protein found in gff file: {}, {}'.format(pair[1], e))
                 continue
 
             # '0' here referring to the first column in the GFF file - the DNA/gene id
             # eg: NZ_xyzxyzxyz - if these are not from the same gene/DNA, skip it
-            if left[0] != right[0]:
+            if ppm_gff[0] != pngc_gff[0]:
                 continue
 
-            distance = abs(left.parent_gene - right.parent_gene)
+            distance = abs(ppm_gff.parent_gene - pngc_gff.parent_gene)
             results.append((pair, distance))
 
         print('# {}'.format(fname))
         for r in results:
-            # r looks like ( (left_data, right_data), distance )
-            left = r[0][0]
-            right = r[0][1]
+            # r looks like ( (ppm_data, pngc_data), distance )
+            ppm = r[0][0]
+            pngc = r[0][1]
             distance = r[1]
             print(''.join(
-                [DATA_FMT.format(x) for x in [left[0], right[0], distance]]
+                [DATA_FMT.format(x) for x in [ppm[0], pngc[0], distance]]
             ))
 
 if __name__ == '__main__':
