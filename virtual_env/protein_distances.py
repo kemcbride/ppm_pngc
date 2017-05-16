@@ -54,6 +54,9 @@ def main():
                     query_names['target_name'].isin(PPM_MATCH_LIST)]
             pngc_rows = query_names.loc[
                     query_names['target_name'].isin(PNGC_MATCH_LIST)]
+            # Drop duplicates based on query_name/protein id
+            pngc_rows = pngc_rows.drop_duplicates(subset='query_name')
+
             # Dataframe.values turns it into a list of lists, where each inner list is the row of data
             # itertools.product does the cartesian product between the two sets.
             pairs = itertools.product(pep_mutase_rows.values, pngc_rows.values)
