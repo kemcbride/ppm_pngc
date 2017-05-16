@@ -3,6 +3,8 @@ virtual_env/bin
 virtual_env/share
 virtual_env/include
 virtual_env/local
+gff_Complete/
+out_Complete/
 **.swp
 **.swo
 **.pyc
