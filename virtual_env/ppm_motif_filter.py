@@ -1,3 +1,5 @@
+DATA_PATA = /Vagabundo/monica/temp/faa-Complete/
+
 def multi_match(target, patterns):
     """Return True if target begins with any of the strings in patterns"""
     for pattern in patterns:
