@@ -1,12 +1,22 @@
 import os, re
 
-INPUT_PATH = '/Vagabundo/monica/temp/faa-Complete/'
-DATA_PATH = '/Vagabundo/monica/temp/70-CUTGA-faa-Complete/'
+database = "Complete"
+#database = "Scaffold"
+
+FAA_PATH = '/Vagabundo/monica/temp/faa-' + database
+INPUT_PATH = '/Vagabundo/monica/temp/70-CUTGA-faa-' + database
 #Check filenames in 70-CUTGA (.out) and scan for those filenames in faa-Complete(.faa)
 #Read filenames in faa-Complete (amino acid sequences) to scan for conserved motif (EDKXXXXXNS)
 #The XXXXX is a variable region where X can be any letter
 #The variable region itself can vary in number of X - scan for 3 - 7X
 #Output should be all of the filenames that have this motif from faa-Complete
+
+#read .out files to get the names that we want from .faa
+out_files = os.listdir(INPUT_PATH)
+for fname in out_files:
+    faa_fname = fname.split('.')[0] + '.faa'
+    #read .faa files?? probably?
+    faa_file = open(os.path.join(FAA_PATH, faa_name), 'r')
 
 def multi_match(target, patterns):
     """Return True if target begins with any of the strings in patterns"""
