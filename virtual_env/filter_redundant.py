@@ -22,8 +22,5 @@ if __name__ == '__main__':
                 if ppm_name in ppm_motif_list and nonredundant_name in nonredundant_list:
                    print(line)
                    line = f.readline()
-                      print(line)
-                      line = f.readline()
-
-
-
+                   print(line)
+             line = f.readline()
