@@ -20,7 +20,10 @@ if __name__ == '__main__':
                 ppm_name = line.split()[-1]
                 nonredundant_name = ppm_name.split('.')[0]
                 if ppm_name in ppm_motif_list and nonredundant_name in nonredundant_list:
-                   print()
+                   print(line)
+                   line = f.readline()
+                      print(line)
+                      line = f.readline()
 
 
 
