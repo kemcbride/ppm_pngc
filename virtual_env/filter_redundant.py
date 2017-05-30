@@ -12,6 +12,9 @@ if __name__ == '__main__':
        nonredundant_list = f.readlines()
     with open(PPM) as f:
        ppm_motif_list = f.readlines()
-
+    with open(OUTPUT) as f:
+        line = f.readline()
+        while line != '':
+             if line.startswith('#'):
 
 
