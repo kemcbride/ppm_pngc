@@ -7,7 +7,9 @@ PPM = '/Vagabundo/monica/notes/virtual_env/ppm_motif_complete_matches'
 OUTPUT = '/Vagabundo/monica/notes/virtual_env/shortest_complete_distance'
 
 #OUTPUT FORMAT is GCF_000005225 for LIST_PATH and GCF_000005225.out for PPM_PATH
+f = open(LIST, 'r')
+f.readline()
 
 if __name__ == '__main__':
-    with open(LIST, "r") as ins:
+
 
