@@ -19,6 +19,7 @@ if __name__ == '__main__':
                 fname = line.split()[-1]
                 ppm_name = line.split()[-1]
                 nonredundant_name = ppm_name.split('.')[0]
-
+                if motif_name in motif_list and nonredundant_name in nonredundant_list:
+                   print()
 
 
