@@ -16,5 +16,9 @@ if __name__ == '__main__':
         line = f.readline()
         while line != '':
              if line.startswith('#'):
+                fname = line.split()[-1]
+                ppm_name = line.split()[-1]
+                nonredundant_name = ppm_name.split('.')[0]
+
 
 
