@@ -28,6 +28,12 @@ COLS = ['target_name', 't_accession', 'tlen', 'query_name', 'q_accession', 'qlen
 # formats it left-aligned with 20 spaces
 DATA_FMT = '{!s:<20}'
 
+qname = query_names.query_name
+def new_function(qname):
+    output = os.system('blastdbcmd -target_only -entry " + qname +  " -outfmt %s'.format(qname))
+    has_motif = re.search(pattern,output)
+    return has_motif
+
 def parse_lastcol(col_text):
     data = col_text.split(';')
     data = [segment.split('=') for segment in data]
@@ -56,22 +62,7 @@ def main():
             query_names = input_df[['query_name', 'target_name']]
             # print(query_names)
             # We are matching the target name (i.e. PEP_mutase) with the query name (i.e. WP_05123543.01)
-
-            # I GUESS I NEED THE QUERY NAME AND LIKE... IMA USE THAT AS AN INPUT FOR BLAST?? SURE..
-            entry = 'query_name'
-            cmd = "blastdbcmd -target_only -entry " + entry +  " -outfmt %s"
-            BLAST_PATH = os.system(cmd)
-            # THIS BETTER WORK - OKAY SO TOTES ASSUMING THAT WE GET THIS RUNNING AND WE HAVE A BUNCH OF SEQUENCES
-            # NOW WE NEED TO RUN THE EDK MOTIF FINDER
-            # IF YOU ARE ASKING ME WHY I PUT THIS CODE HERE IT'S CAUSE WE ARE RUNNING THIS WITHIN THE LOOP LOOKING AT .OUT FILES
-            # WHICH GIVES US TEH .OUT FILES WE CARE ABOUT SO WE CAN GET THE QUERY NAMES AS INPUTS
-            print(BLAST_PATH)
-
-            #EDK MOTIF CODE
-            def file_has_motif(BLAST_PATH, motif_regex):
-                file_contents = open(BLAST_PATH, 'r').read()
-
-
+            
             # Now we're only creating pairs between PPM and PNGC rows.
             pep_mutase_rows = query_names.loc[
                     query_names['target_name'].isin(PPM_MATCH_LIST)]
