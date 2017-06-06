@@ -30,7 +30,7 @@ DATA_FMT = '{!s:<20}'
 
 qname = query_names.query_name
 def new_function(qname):
-    output = subprocess.check_output('blastdbcmd -target_only -entry " + qname +  " -outfmt %s'.format(qname))
+    output = subprocess.check_output('blastdbcmd -target_only -entry ' + qname + ' -outfmt %s')
     has_motif = re.search('EDK\w{3,7}NS',output)
     return has_motif
 
