@@ -10,6 +10,7 @@ from StringIO import StringIO
 from collections import defaultdict
 import itertools
 import gzip
+import subprocess
 
 # Lists of the protein names that are PNGC or PEP_MUTASE
 from util import PPM_MATCH_LIST, PNGC_MATCH_LIST
