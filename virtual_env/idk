@@ -30,10 +30,8 @@ COLS = ['target_name', 't_accession', 'tlen', 'query_name', 'q_accession', 'qlen
 DATA_FMT = '{!s:<20}'
 
 def new_function(qname):
-    print(qname)
-    command = 'blastdbcmd -target_only -entry ' + qname + r' -outfmt \%s'
-    output = subprocess.check_output(command)
-    print(output)
+    command = 'blastdbcmd -target_only -entry ' + qname + ' -outfmt %s'
+    output = subprocess.check_output(command, shell = True)
     has_motif = re.search('EDK\w{3,7}NS',output)
     return bool(has_motif)
 
