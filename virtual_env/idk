@@ -30,8 +30,8 @@ DATA_FMT = '{!s:<20}'
 
 qname = query_names.query_name
 def new_function(qname):
-    output = os.system('blastdbcmd -target_only -entry " + qname +  " -outfmt %s'.format(qname))
-    has_motif = re.search(pattern,output)
+    output = subprocess.check_output('blastdbcmd -target_only -entry " + qname +  " -outfmt %s'.format(qname))
+    has_motif = re.search('EDK\w{3,7}NS',output)
     return has_motif
 
 def parse_lastcol(col_text):
@@ -62,6 +62,8 @@ def main():
             query_names = input_df[['query_name', 'target_name']]
             # print(query_names)
             # We are matching the target name (i.e. PEP_mutase) with the query name (i.e. WP_05123543.01)
+            qname = query_names.query_name
+            query_names = query_names[query_names.apply(lambda row: new_function(row.query_name), axis=1)]    
             
             # Now we're only creating pairs between PPM and PNGC rows.
             pep_mutase_rows = query_names.loc[
