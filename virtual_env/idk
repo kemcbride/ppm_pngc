@@ -14,14 +14,14 @@ import subprocess
 
 # Lists of the protein names that are PNGC or PEP_MUTASE
 from util import PPM_MATCH_LIST, PNGC_MATCH_LIST
-#pieces = "Complete"
-pieces = "Scaffold"
+pieces = "Complete"
+#pieces = "Scaffold"
 
 # I'm assuming that we'll just know what the file paths we want are:
 INPUT_PATH = '/Vagabundo/monica/temp/70-CUTGA-OUT-faa-' + pieces
 #INPUT_PATH = '/Vagabundo/monica/notes/virtual_env/directory'
 GFF_PATH   = '/research/gmh/GENOME_DB/gff-' + pieces
-LIST_PATH = '/Vagabundo/monica/notes/complete_list'
+#LIST_PATH = '/Vagabundo/monica/notes/complete_list'
 #COLS = ['target_name', 't_accession', 'tlen', 'query_name', 'q_accession', 'qlen', 'e_full', 'score_full', 'bias_full', 'num_domain', 'of_domain', 'ie_domain', 'score_domain', 'bias_domain', 'f$
 COLS = ['target_name', 't_accession', 'tlen', 'query_name', 'q_accession', 'qlen', 'e_full' ]
 
@@ -63,13 +63,14 @@ def main():
             query_names = input_df[['query_name', 'target_name']]
             # print(query_names)
             # We are matching the target name (i.e. PEP_mutase) with the query name (i.e. WP_05123543.01)
-            qname = query_names.query_name
-            query_names = query_names[query_names.apply(lambda row: new_function(row.query_name), axis=1)]    
             
             # Now we're only creating pairs between PPM and PNGC rows.
             pep_mutase_rows = query_names.loc[
                     query_names['target_name'].isin(PPM_MATCH_LIST)]
+            
+            pep_mutase_rows = pep_mutase_rows[pep_mutase_rows.apply(lambda row: new_function(row.query_name), axis=1)]
             #print(pep_mutase_rows)
+            
             pngc_rows = query_names.loc[
                     query_names['target_name'].isin(PNGC_MATCH_LIST)]
             #print(pngc_rows)
