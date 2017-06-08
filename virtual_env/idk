@@ -29,8 +29,9 @@ COLS = ['target_name', 't_accession', 'tlen', 'query_name', 'q_accession', 'qlen
 # formats it left-aligned with 20 spaces
 DATA_FMT = '{!s:<20}'
 
+blastdb = /research/gmh/GENOME_DB/blastpDB-Complete/GCF_*
 def new_function(qname):
-    command = 'blastdbcmd -target_only -entry ' + qname + ' -outfmt %s'
+    command = 'blastdbcmd -db ' + blastdb + ' -target_only -entry ' + qname + ' -outfmt %s'
     output = subprocess.check_output(command, shell = True)
     has_motif = re.search('EDK\w{3,7}NS',output)
     return bool(has_motif)
