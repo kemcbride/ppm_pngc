@@ -23,15 +23,16 @@ sy
 
 # NOTE: If you want to filter out low frequency results, use:
 hist_df <- hist_df[hist_df$freq > ceiling(mean(hist_df$freq)),]
+hist_df <- hist_df[hist_df$freq > ceiling(mean(hist_df$freq)),]
 
 freq_max <- max(hist_df['freq']) # Relies on hist_df, so must be after its creation
 
 
-plot <- ggplot(hist_df, aes(x=reorder(V2, freq), y=freq)) + geom_bar(stat='identity') + ylim(0, freq_max)
+plot <- ggplot(hist_df, aes(x=reorder(V2, freq), y=freq)) + geom_bar(stat='identity', width=0.3, fill='darkblue') + ylim(0, freq_max)
 
-pdf(file='Rplots.pdf', width=8, height=15)
+pdf(file='Rplots.pdf', width=5, height=10)
 
 plot + theme_hc() +
 	theme(axis.text.x = element_text(size=8)) +
-	labs(x='Species', y='Frequency') + 
+	labs(x='Genus', y='Frequency') + 
 	coord_flip()
