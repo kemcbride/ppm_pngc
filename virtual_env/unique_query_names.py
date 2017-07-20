@@ -20,16 +20,16 @@ def unique_query_names(list_path, outfile_dir):
 
     unique_query_names = set()
     for filename in outfile_list:
-        try:
-            df = pd.read_csv(os.path.join(outfile_dir, filename),
-                comment='#',
-                header=None,
-                delimiter='\s+',
-                usecols=range(4)
-                )
-        except IOError:  # generally, file not found
-            # print ('File not found')
+        fpath = os.path.join(outfile_dir, filename)
+        if not os.path.isfile(fpath):
+            print ("File {} does not exist".format(fpath))
             continue
+        df = pd.read_csv(os.path.join(outfile_dir, filename),
+            comment='#',
+            header=None,
+            delimiter='\s+',
+            usecols=range(4)
+            )
         df.columns = COLS  # add the column names to the dataframe
         unique_query_names.update(df.query_name.values())
     return unique_query_names
