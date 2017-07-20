@@ -12,7 +12,7 @@ import sys
 from protein_distances import parse_lastcol
 
 
-PATH = '/home/kelly/Dropbox/gff/0 distances'
+PATH = '/home/kelly/Dropbox/gff/gff_files'
 
 def convert_str_int(string):
     filtered = filter(lambda s: s.isdigit(), string)
@@ -38,11 +38,11 @@ def print_annotations(gcf_id, protein_ids, dist):
             lcd['Parent'] = convert_str_int(lcd['Parent'])
 
             # Do this so we can instantly locate the desired proteins later
-            if lcd['Name'] in protein_ids:
+            if lcd.get('Name') in protein_ids:
                 protein_id_locations[lcd['Name']] = lcd['Parent']
                 
             protein_data[ lcd['Parent'] ] = (
-                lcd['protein_id'],
+                lcd.get( 'protein_id' ),
                 lcd['ID'],
                 data[0],
                 lcd.get('Note'),
@@ -69,8 +69,8 @@ if __name__ == '__main__':
 
             Program Usage: cat input_list | python functions.py GCF_id 10
             """)
-    parser.add_argument('gcf', help='GCF identifier, eg. GCF_0001545')
-    parser.add_argument('dist', default=10, type=int,
+    parser.add_argument('gcf', help='GCF identifier, eg. GCF_00024545')
+    parser.add_argument('--dist', default=10, type=int,
             help='The distance about each to produce annotations for, eg. 10')
     args = parser.parse_args()
 
