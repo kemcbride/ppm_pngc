@@ -17,6 +17,7 @@ COLS = ['target_name', 't_accession', 'tlen', 'query_name']
 def unique_query_names(list_path, outfile_dir):
     with open(list_path, 'r') as listfile:
         outfile_list = listfile.readlines()
+    outfile_list = [fname.strip() for fname in outfile_list]
 
     unique_query_names = set()
     for filename in outfile_list:
