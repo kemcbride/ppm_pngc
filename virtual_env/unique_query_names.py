@@ -32,7 +32,7 @@ def unique_query_names(list_path, outfile_dir):
             usecols=range(4)
             )
         df.columns = COLS  # add the column names to the dataframe
-        unique_query_names.update(df.query_name.values())
+        unique_query_names.update(df.query_name.values)
     return unique_query_names
 
     
