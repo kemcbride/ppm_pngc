@@ -69,7 +69,7 @@ if __name__ == '__main__':
     input_files = files_remaining(os.path.join(TEMP_PATH, IDIR), os.path.join(TEMP_PATH, ODIR),
             cond=lambda x: x in both_match_list)
 
-    for f in input_files[:3]:
+    for f in input_files:
         write_filtered_file(f)
 
     total_rows = 0
