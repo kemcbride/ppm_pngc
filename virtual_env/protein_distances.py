@@ -17,7 +17,7 @@ pieces = "Complete"
 
 INPUT_PATH = '/Vagabundo/monica/temp/70-CUTGA-OUT-faa-' + pieces
 GFF_PATH   = '/research/gmh/GENOME_DB/gff-' + pieces
-LIST_PATH = '/Vagabundo/monica/notes/complete_list'
+LIST_PATH = 'WHEREVER THE OUTPUT TO PPM_MOTIF_FILTER IS'
 COLS = ['target_name', 't_accession', 'tlen', 'query_name', 'q_accession', 'qlen', 'e_full' ]
 
 # This format string a - calls str() on each arg, and then
