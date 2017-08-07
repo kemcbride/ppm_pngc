@@ -1,26 +1,38 @@
+#!/usr/bin/env python
 # Some kind of program to measure distances between proteins that have hits
 # based on a certain .out file (70-cutga-out output.)
 
 import pandas as pd
 import sys
-import os
+import os, re
 from StringIO import StringIO
 from collections import defaultdict
 import itertools
 import gzip
+import subprocess
 
 # Lists of the protein names that are PNGC or PEP_MUTASE
 from util import PPM_MATCH_LIST, PNGC_MATCH_LIST
+pieces = "Complete"
+#pieces = "Scaffold"
 
-# I'm assuming that we'll just know what the file paths we want are:
-INPUT_PATH = '/Vagabundo/monica/temp/70-CUTGA-OUT-faa-Complete'
-GFF_PATH = '/research/gmh/GENOME_DB/gff-Complete'
-COLS = ['target_name', 't_accession', 'tlen', 'query_name', 'q_accession', 'qlen', 'e_full', 'score_full', 'bias_full', 'num_domain', 'of_domain', 'ie_domain', 'score_domain', 'bias_domain', 'from_hmm', 'to_hmm', 'from_ali', 'to_ali', 'from_env', 'to_env', 'acc', 'desc_target']
+INPUT_PATH = '/Vagabundo/monica/temp/70-CUTGA-OUT-faa-' + pieces
+GFF_PATH   = '/research/gmh/GENOME_DB/gff-' + pieces
+#LIST_PATH = '/Vagabundo/monica/notes/complete_list'
+COLS = ['target_name', 't_accession', 'tlen', 'query_name', 'q_accession', 'qlen', 'e_full' ]
 
 # This format string a - calls str() on each arg, and then
 # formats it left-aligned with 20 spaces
 DATA_FMT = '{!s:<20}'
-        
+
+blastdb = '/research/gmh/GENOME_DB/blastpDB-Complete/GCF_{}'
+def blast_motif_match(qname):
+    command = 'blastdbcmd -db ' + blastdb + ' -target_only -entry ' + qname + ' -outfmt %s'
+    output = subprocess.check_output(command, shell = True)
+    has_motif = re.search('EDK\w{3,7}NS',output)
+    return bool(has_motif)
+
+
 def parse_lastcol(col_text):
     data = col_text.split(';')
     data = [segment.split('=') for segment in data]
@@ -43,7 +55,7 @@ def main():
                 comment='#',
                 header=None,
                 delimiter='\s+',
-                usecols=range(22)
+                usecols=range(7)
                 )
             input_df.columns = COLS  # add the column names to the dataframe
             query_names = input_df[['query_name', 'target_name']]
@@ -52,6 +64,8 @@ def main():
             # Now we're only creating pairs between PPM and PNGC rows.
             pep_mutase_rows = query_names.loc[
                     query_names['target_name'].isin(PPM_MATCH_LIST)]
+            pep_mutase_rows = pep_mutase_rows[pep_mutase_rows.apply(lambda row: blast_motif_match(row.query_name), axis=1)]
+
             pngc_rows = query_names.loc[
                     query_names['target_name'].isin(PNGC_MATCH_LIST)]
             # Drop duplicates based on query_name/protein id
@@ -66,7 +80,7 @@ def main():
             with gzip.GzipFile(os.path.join(GFF_PATH, gff_fname), 'r') as gff_file:
                 gff_text = gff_file.read()
             gff_lines = [line for line in gff_text.split('\n') if 'CDS' in line]
-            gff_lines = [line for line in gff_text.split('\n') if 'Protein' in line]
+            #gff_lines = [line for line in gff_text.split('\n') if 'Protein' in line]
             gff_lines = [line for line in gff_lines if 'protein_id' in line]
             gff_text = '\n'.join(gff_lines)
             # Only interested in the lines containing gene# and the protein_id
@@ -77,8 +91,6 @@ def main():
                 )
 
         except Exception as e:
-            # idea: make all output that is non-relevant/useful a comment,
-            # so any code that reads the output files can ignore it
             print('# {}'.format(e))
             continue
 
