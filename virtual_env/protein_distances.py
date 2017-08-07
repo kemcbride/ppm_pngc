@@ -14,23 +14,26 @@ import subprocess
 # Lists of the protein names that are PNGC or PEP_MUTASE
 from util import PPM_MATCH_LIST, PNGC_MATCH_LIST
 pieces = "Complete"
-#pieces = "Scaffold"
 
 INPUT_PATH = '/Vagabundo/monica/temp/70-CUTGA-OUT-faa-' + pieces
 GFF_PATH   = '/research/gmh/GENOME_DB/gff-' + pieces
-#LIST_PATH = '/Vagabundo/monica/notes/complete_list'
+LIST_PATH = '/Vagabundo/monica/notes/complete_list'
 COLS = ['target_name', 't_accession', 'tlen', 'query_name', 'q_accession', 'qlen', 'e_full' ]
 
 # This format string a - calls str() on each arg, and then
 # formats it left-aligned with 20 spaces
 DATA_FMT = '{!s:<20}'
 
-blastdb = '/research/gmh/GENOME_DB/blastpDB-Complete/GCF_{}'
-def blast_motif_match(qname):
-    command = 'blastdbcmd -db ' + blastdb + ' -target_only -entry ' + qname + ' -outfmt %s'
-    output = subprocess.check_output(command, shell = True)
-    has_motif = re.search('EDK\w{3,7}NS',output)
-    return bool(has_motif)
+
+def parse_motif_matches(list_path):
+    match_data = {}
+    with open(list_path, 'r') as f:
+        raw_lines = f.readlines()
+    for line in raw_lines:
+        gcf_id = line.split(':')[0]
+        wp_ids = line.split(':')[1].split(',')
+        match_data[gcf_id] = wp_ids
+    return match_data
 
 
 def parse_lastcol(col_text):
@@ -46,10 +49,14 @@ def parse_lastcol(col_text):
 def main():
     # Print the column names
     print(''.join([DATA_FMT.format(colname) for colname in ['PPM', 'PNGC', 'Distance']]))
+    motif_match_data = parse_motif_matches(LIST_PATH)
 
     # Reading all the .out files in gff-Complete
     out_files = os.listdir(INPUT_PATH)
     for fname in out_files:
+        gcf_id = fname.split('.')[0]
+        motif_matches = lambda s: s.isin(motif_match_data.get(gcf_id))
+
         try:
             input_df = pd.read_csv(os.path.join(INPUT_PATH, fname),
                 comment='#',
@@ -64,7 +71,7 @@ def main():
             # Now we're only creating pairs between PPM and PNGC rows.
             pep_mutase_rows = query_names.loc[
                     query_names['target_name'].isin(PPM_MATCH_LIST)]
-            pep_mutase_rows = pep_mutase_rows[pep_mutase_rows.apply(lambda row: blast_motif_match(row.query_name), axis=1)]
+            pep_mutase_rows = pep_mutase_rows[pep_mutase_rows.apply(lambda row: motif_matches(row.query_name), axis=1)]
 
             pngc_rows = query_names.loc[
                     query_names['target_name'].isin(PNGC_MATCH_LIST)]
