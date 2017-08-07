@@ -12,18 +12,6 @@ INPUT_PATH = '/Vagabundo/monica/temp/70-CUTGA-OUT-faa-' + database
 #The variable region itself can vary in number of X - scan for 3 - 7X
 #Output should be all of the filenames that have this motif from faa-Complete
 
-#def multi_match(target, patterns):
-#    """Return True if target begins with any of the strings in patterns"""
-#    for pattern in patterns:
-#        if target.startswith(pattern):
-#            return True
-
-#def multi_search(target,patterns):
-#    """Return the first position in target where any of the strings in patterns is found"""
-#    return min([target.find(pattern)
-#                for pattern in patterns
-#                if target.find(pattern >= 0)])
-
 def file_has_motif(FAA_PATH, motif_regex):
     file_contents = open(FAA_PATH, 'r').read()
     has_motif = bool(re.search(motif_regex, file_contents))
