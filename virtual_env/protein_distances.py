@@ -71,7 +71,9 @@ def main():
             # Now we're only creating pairs between PPM and PNGC rows.
             pep_mutase_rows = query_names.loc[
                     query_names['target_name'].isin(PPM_MATCH_LIST)]
-            pep_mutase_rows = pep_mutase_rows[pep_mutase_rows.apply(lambda row: motif_matches(row.query_name), axis=1)]
+            pep_mutase_rows = pep_mutase_rows.drop_duplicates(subset='query_name')
+            pep_mutase_rows = pep_mutase_rows.loc[
+                    pep_mutase_rows.apply(lambda row: motif_matches(row.query_name), axis=1)]
 
             pngc_rows = query_names.loc[
                     query_names['target_name'].isin(PNGC_MATCH_LIST)]
