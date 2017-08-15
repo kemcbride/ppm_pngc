@@ -4,6 +4,7 @@ import os, pandas as pd
 SETNAME = 'Complete'
 DB_NAME = 'faa-{}'.format(SETNAME)
 TEMP_PATH ='/Vagabundo/monica/temp/'
+# TEMP_PATH ='/home/kelly/Dropbox/gff/temp/'
 OUTPUT_DIR ='CUTGA-OUT-{}'.format(DB_NAME)
 ZIP_PATH = os.path.join('/research/gmh/GENOME_DB/{}', DB_NAME)
 
@@ -25,3 +26,33 @@ def files_remaining(idir, odir, cond=lambda x: true):
     if cond is not None:
         files = [f for f in files if cond(f)]
     return files
+
+
+BLASTDB = '/research/gmh/GENOME_DB/blastpDB-Complete/GCF_{}'
+def blast_motif_match(qname):
+    command = 'blastdbcmd -db ' + BLASTDB + ' -target_only -entry ' + qname + ' -outfmt %s'
+    output = subprocess.check_output(command, shell = True)
+    has_motif = re.search('EDK\w{3,7}NS',output)
+    return bool(has_motif)
+
+
+def parse_faa(faa_path):
+    with open(faa_path, 'r') as f:
+        file_contents = f.read()
+    raw_sequence_list = file_contents.split('>')
+
+    del file_contents # i hope this wouln't logically break the code
+
+    # Now, I need to turn each item into the form WP_id : sequence
+    faa_data = {}
+
+    # We know that the WP_id is the first space delimited part of the first line.
+    for raw_seq in raw_sequence_list:
+        if not raw_seq: # we know for sure the first result will be empty
+            continue
+        seq_lines = raw_seq.split('\n')
+        wp_id = seq_lines[0].split()[0]
+        sequence = ''.join(seq_lines[1:])
+        faa_data[wp_id] = sequence
+
+    return faa_data

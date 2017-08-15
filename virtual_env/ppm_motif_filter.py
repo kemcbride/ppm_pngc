@@ -1,5 +1,7 @@
 import os, re
 
+from util import parse_faa
+
 database = "Complete"
 
 FAA_PATH = '/Vagabundo/monica/temp/faa-' + database
@@ -13,32 +15,8 @@ MOTIF_REGEX = 'EDK\w{3,7}NS'
 # The variable region itself can vary in number of X - scan for 3 - 7X
 
 # Output formatted like:
-# GCF_A
-# WP_A,WP_B,WP_C,WP_D
-# GCF_B
-# WP_A,WP_B,WP_C,WP_D
-
-
-def parse_faa(faa_path):
-    with open(faa_path, 'r') as f:
-        file_contents = f.read()
-    raw_sequence_list = file_contents.split('>')
-
-    del file_contents # i hope this wouln't logically break the code
-
-    # Now, I need to turn each item into the form WP_id : sequence
-    faa_data = {}
-
-    # We know that the WP_id is the first space delimited part of the first line.
-    for raw_seq in raw_sequence_list:
-        if not raw_seq: # we know for sure the first result will be empty
-            continue
-        seq_lines = raw_seq.split('\n')
-        wp_id = seq_lines[0].split()[0]
-        sequence = ''.join(seq_lines[1:])
-        faa_data[wp_id] = sequence
-
-    return faa_data
+# GCF_A:WP_A,WP_B,WP_C,WP_D
+# GCF_B:WP_E,WP_F,WP_G,WP_H
 
 
 def has_motif(content_string, motif_regex):
