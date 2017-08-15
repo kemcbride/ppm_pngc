@@ -63,11 +63,16 @@ def write_sequences(gcf_id, wp_ids, fasta_path):
     try:
         faa_data = parse_faa('/'.join([fasta_path, gcf_id+'.faa']))
     except IOError as e:
-        print('# {}'.format(e))
+        print('# IOError: (line 64) {}'.format(e))
         return
 
     for wp_id in wp_ids:
-        sequence = faa_data[wp_id]
+        try:
+            sequence = faa_data[wp_id]
+        except KeyError as e:
+            print('# KeyError: (line 71) {}'.format(e))
+            return
+
         write_fasta_sequence(wp_id, sequence)
 
 
