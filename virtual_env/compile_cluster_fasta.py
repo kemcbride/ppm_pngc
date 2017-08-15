@@ -41,6 +41,9 @@ def get_distance_data(distance_path):
                 gcf_id = line_data[0].split('.')[0] # remove the .out from the end
 
         else:
+            if gcf_id is None:
+                raise Exception("Error: Can't start adding data before finding a valid GCF id")
+
             # The line doesn't start with a comment symbol - it's a data line!
             line_data = line.split()
             for item in line_data[:2]: # up to 2 - ignore the distance value
