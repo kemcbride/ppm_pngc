@@ -76,9 +76,13 @@ def write_fasta_output(distance_file_path, fasta_path):
 
 
 if __name__ == '__main__':
-    argparser = argparse.ArgumentParser()
-    argparser.add_argument('distances_path')
-    argparser.add_argument('fasta_path')
+    argparser = argparse.ArgumentParser(
+            description=('Creates a new fasta file containing all sequences '
+            'referenced in a given protein_distances.py output file.'))
+    argparser.add_argument('distances_path',
+            help='Path to the input file, created by protein_distances.py')
+    argparser.add_argument('fasta_path',
+            help='Path to directory where relevant fasta files are located.')
     args = argparser.parse_args()
 
     write_fasta_output(args.distances_path, args.fasta_path)
