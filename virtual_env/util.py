@@ -16,6 +16,15 @@ HMM_FILE = '/Vagabundo/monica/Proteins/models.hmm'
 
 MULTIPROCESSING_FACTOR = 100 # We'll run 100 per batch
 
+
+class FastaData(object):
+
+    def __init__(self, wp_id, sequence_data, extra_data=''):
+        self.wp = wp_id
+        self.sequence = sequence_data
+        self.extra_data = extra_data
+
+
 # You could pass in a lambda/function to cond and have that also filter out
 # false results from idir (ie. is file in idir also in sort_matches both.txt)
 def files_remaining(idir, odir, cond=lambda x: true):
@@ -51,8 +60,11 @@ def parse_faa(faa_path):
         if not raw_seq: # we know for sure the first result will be empty
             continue
         seq_lines = raw_seq.split('\n')
-        wp_id = seq_lines[0].split()[0]
+        first_line_data = seq_lines[0].split()
+        wp_id = first_line_data[0]
+        extra_data = ' '.join(seq_lines[0].split()[1:]) if len(first_line_data) > 1 else ''
         sequence = ''.join(seq_lines[1:])
-        faa_data[wp_id] = sequence
+        fd = FastaData(wp_id, sequence, extra_data=extra_data)
+        faa_data[wp_id] = fd
 
     return faa_data

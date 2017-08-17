@@ -52,10 +52,10 @@ def get_distance_data(distance_path):
     return wp_dict
 
 
-def write_fasta_sequence(wp_id, sequence_data, line_length=80):
-    print('>{}'.format(wp_id))
-    for i in range(0, len(sequence_data), line_length):
-        print(sequence_data[i:i+line_length])
+def write_fasta_sequence(fasta_data, line_length=80):
+    print('>{} {}'.format(fasta_data.wp, fasta_data.extra_data))
+    for i in range(0, len(fasta_data.sequence), line_length):
+        print(fasta_data.sequence[i:i+line_length])
 
 
 def write_sequences(gcf_id, wp_ids, fasta_path):
@@ -68,12 +68,12 @@ def write_sequences(gcf_id, wp_ids, fasta_path):
 
     for wp_id in wp_ids:
         try:
-            sequence = faa_data[wp_id]
+            fasta_data = faa_data[wp_id]
         except KeyError as e:
             print('# KeyError: (line 71) {}'.format(e))
             return
 
-        write_fasta_sequence(wp_id, sequence)
+        write_fasta_sequence(fasta_data)
 
 
 def write_fasta_output(distance_file_path, fasta_path):

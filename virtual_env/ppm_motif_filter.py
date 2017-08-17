@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
             faa_sequences = parse_faa(faa_path)
             matching_wps = []
-            for wp_id, seq in faa_sequences.iteritems():
-                if has_motif(seq, MOTIF_REGEX):
+            for wp_id, fasta_data in faa_sequences.iteritems():
+                if has_motif(fasta_data.sequence, MOTIF_REGEX):
                     matching_wps.append(wp_id)
             print gcf_id + ':' + ','.join(matching_wps)
