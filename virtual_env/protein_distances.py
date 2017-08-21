@@ -10,6 +10,7 @@ from collections import defaultdict
 import itertools
 import gzip
 import subprocess
+import argparse
 
 # Lists of the protein names that are PNGC or PEP_MUTASE
 from util import PPM_MATCH_LIST, PNGC_MATCH_LIST
@@ -46,7 +47,7 @@ def parse_lastcol(col_text):
     return data
 
 
-def main():
+def main(no_motif_filter=False):
     # Print the column names
     print(''.join([DATA_FMT.format(colname) for colname in ['PPM', 'PNGC', 'Distance']]))
     motif_match_data = parse_motif_matches(LIST_PATH)
@@ -72,8 +73,14 @@ def main():
             pep_mutase_rows = query_names.loc[
                     query_names['target_name'].isin(PPM_MATCH_LIST)]
             pep_mutase_rows = pep_mutase_rows.drop_duplicates(subset='query_name')
-            pep_mutase_rows = pep_mutase_rows.loc[
-                    pep_mutase_rows.apply(lambda row: motif_matches(row.query_name), axis=1)]
+
+            # We'll use the motif_filter ONLY if the arguments specify that we should-
+            # the no_motif_filter argument says NOT to use it - so we'll do it only
+            # if that is false.
+            use_motif_filter = not no_motif_filter
+            if use_motif_filter:
+                pep_mutase_rows = pep_mutase_rows.loc[
+                        pep_mutase_rows.apply(lambda row: motif_matches(row.query_name), axis=1)]
 
             pngc_rows = query_names.loc[
                     query_names['target_name'].isin(PNGC_MATCH_LIST)]
@@ -149,5 +156,10 @@ def main():
                 [DATA_FMT.format(x) for x in [ppm[0], pngc[0], distance]]
             ))
 
+
 if __name__ == '__main__':
-    main()
+    arg_parser = argparse.ArgumentParser()
+    arg_parser.add_argument('--no_motif_filter', action='store_true', help='')
+    args = arg_parser.parse_args()
+
+    main(no_motif_filter=args.no_motif_filter)
