@@ -4,7 +4,7 @@ from util import parse_faa
 
 database = "Complete"
 
-FAA_PATH = '/Vagabundo/monica/temp/faa-' + database
+FAA_PATH = '/research/gmh/GENOME-DB/faa-' + database
 INPUT_PATH = '/Vagabundo/monica/temp/70-CUTGA-OUT-faa-' + database
 
 MOTIF_REGEX = 'EDK\w{3,7}NS'
@@ -34,7 +34,9 @@ if __name__ == '__main__':
     out_files = [f for f in os.listdir(INPUT_PATH) if f.endswith('.out')]
     for fname in out_files:
         gcf_id = fname.split('.')[0]
-        faa_fname = fname.split('.')[0] + '.faa'
+
+        # Use .faa.gz as extension, to read gzipped files with parse_faa
+        faa_fname = fname.split('.')[0] + '.faa.gz'
 
         faa_path = FAA_PATH + '/' + faa_fname
         if file_has_motif(faa_path, MOTIF_REGEX):

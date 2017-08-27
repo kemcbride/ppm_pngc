@@ -1,4 +1,6 @@
-import os, pandas as pd
+import os
+import pandas as pd
+import gzip
 
 # Constants for now - From process_hmmscan
 SETNAME = 'Complete'
@@ -46,8 +48,12 @@ def blast_motif_match(qname):
 
 
 def parse_faa(faa_path):
-    with open(faa_path, 'r') as f:
-        file_contents = f.read()
+    if faa_path.endswith('.gz'):
+        with gzip.open(faa_path, 'r') as f:
+            file_contents = f.read()
+    else:
+        with open(faa_path, 'r') as f:
+            file_contents = f.read()
     raw_sequence_list = file_contents.split('>')
 
     del file_contents # Save memory! Helps the computer run better!
@@ -77,18 +83,20 @@ def write_fasta_sequence(fasta_data, line_length=80):
 
 
 def write_fasta_sequences(gcf_id, wp_ids, fasta_path):
-    # step one - open the gcf fasta file
     try:
-        faa_data = parse_faa('/'.join([fasta_path, gcf_id+'.faa']))
+        faa_data = parse_faa('/'.join([fasta_path, gcf_id+'.faa.gz']))
     except IOError as e:
-        print('# IOError: (line 64) {}'.format(e))
-        return
+        try:
+            faa_data = parse_faa('/'.join([fasta_path, gcf_id+'.faa']))
+        except IOError as e:
+            print('# IOError: (write_fasta_sequences) {}'.format(e))
+            return
 
     for wp_id in wp_ids:
         try:
             fasta_data = faa_data[wp_id]
         except KeyError as e:
-            print('# KeyError: (line 71) {}'.format(e))
+            print('# KeyError: (write_fasta_sequences) {}'.format(e))
             return
 
         write_fasta_sequence(fasta_data)

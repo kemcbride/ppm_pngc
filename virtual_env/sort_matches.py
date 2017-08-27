@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+
+# This script reads .out files only.
+
 from __future__ import print_function
 import os
 from util import *

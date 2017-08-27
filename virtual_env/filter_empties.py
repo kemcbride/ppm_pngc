@@ -1,4 +1,7 @@
+#!/usr/bin/env python
 # coding: utf-8
+
+# This script only reads .out files
 import os
 from util import *
 
