@@ -2,15 +2,19 @@
 # Some kind of program to measure distances between proteins that have hits
 # based on a certain .out file (70-cutga-out output.)
 
-import pandas as pd
+from __future__ import print_function
+
 import sys
-import os, re
+import os
+import re
+import gzip
+import argparse
+import traceback
+import itertools
+import subprocess
+import pandas as pd
 from StringIO import StringIO
 from collections import defaultdict
-import itertools
-import gzip
-import subprocess
-import argparse
 
 # Lists of the protein names that are PNGC or PEP_MUTASE
 from util import PPM_MATCH_LIST, PNGC_MATCH_LIST
@@ -56,7 +60,7 @@ def main(no_motif_filter=False):
     out_files = os.listdir(INPUT_PATH)
     for fname in out_files:
         gcf_id = fname.split('.')[0]
-        motif_matches = lambda s: s.isin(motif_match_data.get(gcf_id))
+        motif_matches = lambda s: s in motif_match_data.get(gcf_id, [])
 
         try:
             input_df = pd.read_csv(os.path.join(INPUT_PATH, fname),
@@ -107,7 +111,9 @@ def main(no_motif_filter=False):
                 )
 
         except Exception as e:
-            print('# {}'.format(e))
+            traceback_str = traceback.format_exc(sys.exc_info())
+            commented_tb_str = '\n'.join(['# {}'.format(l) for l in traceback_str.splitlines()])
+            print(commented_tb_str, file=sys.stderr)
             continue
 
         last_col = gff_df[gff_df.columns[-1]]
@@ -130,12 +136,12 @@ def main(no_motif_filter=False):
             try:
                 ppm_gff = gff_df[gff_df.protein_id == pair[0][0]].iloc[0]
             except IndexError as e:
-                print('# Error - no matching ppm protein found in gff file: {}, {}'.format(pair[0], e))
+                print('# Error - no matching ppm protein found in gff file: {}, {}'.format(pair[0], e), file=sys.stderr)
                 continue
             try:
                 pngc_gff = gff_df[gff_df.protein_id == pair[1][0]].iloc[0]
             except IndexError as e:
-                print('# Error - no matching pngc protein found in gff file: {}, {}'.format(pair[1], e))
+                print('# Error - no matching pngc protein found in gff file: {}, {}'.format(pair[1], e), file=sys.stderr)
                 continue
 
             # '0' here referring to the first column in the GFF file - the DNA/gene id
