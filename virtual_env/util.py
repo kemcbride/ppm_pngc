@@ -50,7 +50,7 @@ def parse_faa(faa_path):
         file_contents = f.read()
     raw_sequence_list = file_contents.split('>')
 
-    del file_contents # i hope this wouln't logically break the code
+    del file_contents # Save memory! Helps the computer run better!
 
     # Now, I need to turn each item into the form WP_id : sequence
     faa_data = {}
@@ -68,3 +68,27 @@ def parse_faa(faa_path):
         faa_data[wp_id] = fd
 
     return faa_data
+
+
+def write_fasta_sequence(fasta_data, line_length=80):
+    print('>{} {}'.format(fasta_data.wp, fasta_data.extra_data))
+    for i in range(0, len(fasta_data.sequence), line_length):
+        print(fasta_data.sequence[i:i+line_length])
+
+
+def write_fasta_sequences(gcf_id, wp_ids, fasta_path):
+    # step one - open the gcf fasta file
+    try:
+        faa_data = parse_faa('/'.join([fasta_path, gcf_id+'.faa']))
+    except IOError as e:
+        print('# IOError: (line 64) {}'.format(e))
+        return
+
+    for wp_id in wp_ids:
+        try:
+            fasta_data = faa_data[wp_id]
+        except KeyError as e:
+            print('# KeyError: (line 71) {}'.format(e))
+            return
+
+        write_fasta_sequence(fasta_data)

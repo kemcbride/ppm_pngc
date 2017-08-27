@@ -13,7 +13,7 @@ import sys
 
 from collections import defaultdict
 
-from util import parse_faa
+from util import parse_faa, write_fasta_sequences
 
 
 def get_distance_data(distance_path):
@@ -46,41 +46,22 @@ def get_distance_data(distance_path):
 
             # The line doesn't start with a comment symbol - it's a data line!
             line_data = line.split()
+
+            # Note this part - so this adds the first two items in the line data
+            # These, I assume, are the WP ids. That means that we're producing
+            # a fasta that contains both of these WP ids
+            # (so, both pngc AND the "other" which here is ppm usually)
             for item in line_data[:2]: # up to 2 - ignore the distance value
                 wp_dict[gcf_id].add(item)
 
     return wp_dict
 
 
-def write_fasta_sequence(fasta_data, line_length=80):
-    print('>{} {}'.format(fasta_data.wp, fasta_data.extra_data))
-    for i in range(0, len(fasta_data.sequence), line_length):
-        print(fasta_data.sequence[i:i+line_length])
-
-
-def write_sequences(gcf_id, wp_ids, fasta_path):
-    # step one - open the gcf fasta file
-    try:
-        faa_data = parse_faa('/'.join([fasta_path, gcf_id+'.faa']))
-    except IOError as e:
-        print('# IOError: (line 64) {}'.format(e))
-        return
-
-    for wp_id in wp_ids:
-        try:
-            fasta_data = faa_data[wp_id]
-        except KeyError as e:
-            print('# KeyError: (line 71) {}'.format(e))
-            return
-
-        write_fasta_sequence(fasta_data)
-
-
 def write_fasta_output(distance_file_path, fasta_path):
     distance_data = get_distance_data(distance_file_path)
 
     for gcf_id, wp_list in distance_data.items():
-        write_sequences(gcf_id, wp_list, fasta_path)
+        write_fasta_sequences(gcf_id, wp_list, fasta_path)
 
 
 if __name__ == '__main__':
