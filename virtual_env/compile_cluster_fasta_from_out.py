@@ -27,27 +27,27 @@ def get_outfile_data(outfile_path, valid_target_names):
     # Extract just GCF_xyz from the given file path
     gcf_id = outfile_path.split('/')[-1].split('.')[0]
 
-    with open(out_path, 'r') as out_file:
+    with open(outfile_path, 'r') as out_file:
         # use first 4 columns, fourth column is query name, first column is target name
 
-            input_df = pd.read_csv(os.path.join(INPUT_PATH, fname),
-                comment='#',
-                header=None,
-                delimiter='\s+',
-                usecols=range(4)
-                )
-            input_df.columns = COLS  # add the column names to the dataframe
-            input_df = input_df[['query_name', 'target_name']]
+        input_df = pd.read_csv(outfile_path,
+            comment='#',
+            header=None,
+            delimiter='\s+',
+            usecols=range(4)
+            )
+        input_df.columns = COLS  # add the column names to the dataframe
+        input_df = input_df[['query_name', 'target_name']]
 
-            # Get the unique query names from input_df where target_name is in valid_target_names
-            valid_rows = input_df[input_df['target_name'] in valid_target_names]
-            valid_query_names = valid_rows['query_name'].unique()
-            print('Hello! {} '.format(valid_query_names))
+    # Get the unique query names from input_df where target_name is in valid_target_names
+    valid_rows = input_df[input_df['target_name'].isin(valid_target_names)]
+
+    del input_df
+    valid_query_names = valid_rows['query_name'].unique()
+    print('Hello! {} '.format(valid_query_names))
 
     # Now I want to build a dictionary of GCF_ to list of WP_ ids.
-    wp_dict = defaultdict(set)
-
-
+    wp_dict = {gcf_id: set(valid_query_names)}
     return wp_dict
  
 
@@ -60,9 +60,12 @@ def write_fasta_output(outfile_path, fasta_path):
         file_path = '/'.join([outfile_path, filename])
 
         # Now we need to READ the out file for the data we want.
-        wp_data.update(get_outfile_data(file_path))
+        # NOTE: if you want to CHANGE that it's looking for PNGC or some other target name
+        # then change PNGC_MATCH_LIST here to some other MATCH_LIST -
+        # you'll need to import it from util, above, as well
+        wp_data.update(get_outfile_data(file_path, PNGC_MATCH_LIST))
 
-    for gcf_id, wp_list in distance_data.items():
+    for gcf_id, wp_list in wp_data.items():
         write_fasta_sequences(gcf_id, wp_list, fasta_path)
 
 
@@ -71,7 +74,7 @@ if __name__ == '__main__':
             description=('Creates a new fasta file containing all sequences '
             'referenced in a given protein_distances.py output file.'))
     argparser.add_argument('outfile_path',
-            help='Path to the input file, created by protein_distances.py')
+            help='Path to the directory of .out files to read as input.')
     argparser.add_argument('fasta_path',
             help='Path to directory where relevant fasta files are located.')
     args = argparser.parse_args()
