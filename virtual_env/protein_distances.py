@@ -21,9 +21,16 @@ from util import PPM_MATCH_LIST, PNGC_MATCH_LIST
 pieces = "Complete"
 
 INPUT_PATH = '/Vagabundo/monica/temp/70-CUTGA-OUT-faa-' + pieces
+INPUT_PATH = '/home/kelly/Dropbox/gff/faa'
 GFF_PATH   = '/research/gmh/GENOME_DB/gff-' + pieces
+GFF_PATH   = '/home/kelly/Dropbox/gff/gff_files'
 LIST_PATH = 'WHEREVER THE OUTPUT TO PPM_MOTIF_FILTER IS'
-COLS = ['target_name', 't_accession', 'tlen', 'query_name', 'q_accession', 'qlen', 'e_full' ]
+OUTFILE_COLS = ['target_name', 't_accession', 'tlen', 'query_name', 'q_accession', 'qlen', 'e_full' ]
+
+### NOTE: CHANGE THIS IF YOU WANT THE OUTPUT COLUMNS TO BE DIFFERENTLY NAMED
+### IE. PERHAPS CHANGE PNGC to LICC and PPM to "OTHER MATCH" or something -
+### - MAKE SURE IT CONTAINS NO SPACES!!!
+DISTANCES_COLS = ['PPM', 'PNGC', 'Distance', 'PPM_Target_Name']
 
 # This format string a - calls str() on each arg, and then
 # formats it left-aligned with 20 spaces
@@ -53,8 +60,10 @@ def parse_lastcol(col_text):
 
 def main(no_motif_filter=False):
     # Print the column names
-    print(''.join([DATA_FMT.format(colname) for colname in ['PPM', 'PNGC', 'Distance']]))
-    motif_match_data = parse_motif_matches(LIST_PATH)
+    print(''.join([DATA_FMT.format(colname) for colname in DISTANCES_COLS]))
+    use_motif_filter = not no_motif_filter
+    if use_motif_filter:
+        motif_match_data = parse_motif_matches(LIST_PATH)
 
     # Reading all the .out files in gff-Complete
     out_files = os.listdir(INPUT_PATH)
@@ -67,11 +76,14 @@ def main(no_motif_filter=False):
                 comment='#',
                 header=None,
                 delimiter='\s+',
-                usecols=range(7)
+                usecols=range(7),
+                names=OUTFILE_COLS,
                 )
-            input_df.columns = COLS  # add the column names to the dataframe
             query_names = input_df[['query_name', 'target_name']]
             # We are matching the target name (i.e. PEP_mutase) with the query name (i.e. WP_05123543.01) 
+
+            ### NOTE: TO CHANGE THE MATCH LISTS, CHANGE THEIR USES HERE, 
+            ### ON LINE 83 HERE and LINE 94 BELOW
 
             # Now we're only creating pairs between PPM and PNGC rows.
             pep_mutase_rows = query_names.loc[
@@ -81,7 +93,6 @@ def main(no_motif_filter=False):
             # We'll use the motif_filter ONLY if the arguments specify that we should-
             # the no_motif_filter argument says NOT to use it - so we'll do it only
             # if that is false.
-            use_motif_filter = not no_motif_filter
             if use_motif_filter:
                 pep_mutase_rows = pep_mutase_rows.loc[
                         pep_mutase_rows.apply(lambda row: motif_matches(row.query_name), axis=1)]
@@ -159,7 +170,7 @@ def main(no_motif_filter=False):
             pngc = r[0][1]
             distance = r[1]
             print(''.join(
-                [DATA_FMT.format(x) for x in [ppm[0], pngc[0], distance]]
+                [DATA_FMT.format(x) for x in [ppm[0], pngc[0], distance, ppm[1]]]
             ))
 
 
