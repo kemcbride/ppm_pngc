@@ -7,14 +7,19 @@ SETNAME = 'Complete'
 DB_NAME = 'faa-{}'.format(SETNAME)
 TEMP_PATH ='/Vagabundo/monica/temp/'
 # TEMP_PATH ='/home/kelly/Dropbox/gff/temp/'
-OUTPUT_DIR ='CUTGA-OUT-{}'.format(DB_NAME)
+#OUTPUT_DIR ='CUTGA-OUT-{}'.format(DB_NAME)
+OUTPUT_DIR = 'Clusters/CUTGA-OUT-{}'.format(DB_NAME)
 ZIP_PATH = os.path.join('/research/gmh/GENOME_DB/{}', DB_NAME)
 
 # From/for sort_matches.py and protein_distances.py
 PPM_MATCH_LIST =['PEP_mutase']
 PNGC_MATCH_LIST =['NTP_transferase', 'NTP_transf_3', 'IspD']
+LICA_MATCH_LIST = ['Choline_kinase']
+GLUTAMINE_LIST = ['PEP-utilizers', 'PPDK_N']
+LICB_MATCH_LIST = ['EamA']
 
-HMM_FILE = '/Vagabundo/monica/Proteins/models.hmm'
+#HMM_FILE = '/Vagabundo/monica/Proteins/models.hmm'
+HMM_FILE = '/Vagabundo/monica/Proteins/cluster_models'
 
 MULTIPROCESSING_FACTOR = 100 # We'll run 100 per batch
 
