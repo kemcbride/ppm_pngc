@@ -17,6 +17,7 @@ PNGC_MATCH_LIST =['NTP_transferase', 'NTP_transf_3', 'IspD']
 LICA_MATCH_LIST = ['Choline_kinase']
 GLUTAMINE_LIST = ['PEP-utilizers', 'PPDK_N']
 LICB_MATCH_LIST = ['EamA']
+SWAG_MATCH_LIST = ['PEP_mutase', 'Choline_kinase', 'PEP-utilizers', 'PPDK_N', 'EamA']
 
 #HMM_FILE = '/Vagabundo/monica/Proteins/models.hmm'
 HMM_FILE = '/Vagabundo/monica/Proteins/cluster_models'
