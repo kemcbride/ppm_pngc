@@ -9,7 +9,7 @@ import argparse
 import gzip
 import sys
 
-from protein_distances import parse_lastcol
+from protein_distances import ZIP_PATH, parse_lastcol, parse_faa
 
 
 PATH = '/home/kelly/Dropbox/gff/gff_files'
@@ -34,6 +34,7 @@ class GFFProteinData(object):
 def convert_str_int(string):
     filtered = filter(lambda s: s.isdigit(), string)
     return int(filtered)
+
 
 def collect_protein_data(gcf_id, protein_ids):
     """Returns 2 things: dict of all 'protein data' for given GCF_xyz.gff.gz,
@@ -63,21 +64,36 @@ def collect_protein_data(gcf_id, protein_ids):
 
     return protein_data, protein_id_locations
 
-def get_respective_sequences(protein_data):
-    pass
+
+def get_neighbor_proteins(protein_data, protein_id_locations):
+    """Given protein data and relevant id locations,
+    produce a set of WP ids to look up in order to 'get respective sequences'
+    """
+    # Proper solution probably involves using a set on i, or a dictionary
+    neighbor_ids = {}
+    for name, pos in protein_id_locations.items():
+        for i in range(pos-dist, pos):
+            neighbor_ids[i] = protein_data[i]
+        for i in range(pos+1, pos+1+dist):
+            neighbor_ids[i] = protein_data[i]
+    return neighbor_ids
+
+
+def get_respective_sequences(gcf_id, neighbor_protein_ids):
+    # We know that all sequences MUST be present in this given fasta file.
+    faa_data = parse_faa('/'.join([ZIP_PATH, gcf_id+'.faa.gz']))
+    neighbor_seqs = {k: faa_data[v] for k, v in neighbor_protein_ids.items()}
+    return neighbor_seqs
+
 
 def print_product_annotations(gcf_id, protein_ids, dist):
 
     protein_data, protein_id_locations = collect_protein_data(gcf_id, protein_ids)
     # Problem with how this works: produces duplicate outfit if desired proteins are within 2*dist of each other
     # cop-out solution: | sort | uniq
-    # Proper solution probably involves using a set on i, or like a dictionary to produce output?
     for name, pos in protein_id_locations.items():
         print( '# {} {}'.format(name, pos))
-        for i in range(pos-dist, pos):
-            protein = protein_data[i]
-            print (i, protein.name, protein.product)
-        for i in range(pos+1, pos+1+dist):
+        for i in range(pos-dist, pos+dist):
             protein = protein_data[i]
             print (i, protein.name, protein.product)
 
