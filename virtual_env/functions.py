@@ -63,8 +63,10 @@ def collect_protein_data(gcf_id, protein_ids):
 
     return protein_data, protein_id_locations
 
+def get_respective_sequences(protein_data):
+    pass
 
-def print_annotations(gcf_id, protein_ids, dist):
+def print_product_annotations(gcf_id, protein_ids, dist):
 
     protein_data, protein_id_locations = collect_protein_data(gcf_id, protein_ids)
     # Problem with how this works: produces duplicate outfit if desired proteins are within 2*dist of each other

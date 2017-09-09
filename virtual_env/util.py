@@ -106,3 +106,18 @@ def write_fasta_sequences(gcf_id, wp_ids, fasta_path):
             return
 
         write_fasta_sequence(fasta_data)
+
+
+def run_hmmscan(input_path, output_path):
+    """
+    Run hmmscan on a given input (.faa) file, get output (.out) at output_path
+    @input_path: must point to a valid fasta file (UNZIPPED/RAW)
+    @output_path: path where we will put --domtblout output
+    """
+
+    command = "/usr/local/biotools/bin/hmmscan"
+    options = ['--cut_ga', '--domtblout', output_path]
+    command_array = [command] + options + [HMM_FILE, input_path]
+    code = call(command_array, stdout=DEVNULL)
+    # TODO/NOTE: should probably raise exception if code != 0
+    return code
