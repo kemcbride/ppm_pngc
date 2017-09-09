@@ -121,3 +121,24 @@ def run_hmmscan(input_path, output_path):
     code = call(command_array, stdout=DEVNULL)
     # TODO/NOTE: should probably raise exception if code != 0
     return code
+
+
+def get_family(out_path):
+    """
+    Look up the out_path file as a .out file, and retrieve the 'family' name of
+    the first row (highest e value) (NOTE: ?)
+    """
+    with open(outfile_path, 'r') as out_file:
+        # use first 2 columns, (for no apparent reason)
+        # fourth column is query name, first column is target name
+        input_df = pd.read_csv(outfile_path,
+            comment='#',
+            header=None,
+            delimiter='\s+',
+            usecols=range(2)
+            )
+        first_row = input_df.loc[0].values
+
+    del input_df
+    target_name = first_row[0]  # Column 0 is the Target Name
+    return target_name
