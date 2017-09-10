@@ -9,7 +9,7 @@ import argparse
 import gzip
 import sys
 
-from protein_distances import ZIP_PATH, parse_lastcol, parse_faa
+from util import ZIP_PATH, parse_faa, parse_lastcol
 
 
 PATH = '/home/kelly/Dropbox/gff/gff_files'
@@ -70,6 +70,7 @@ def get_neighbor_proteins(protein_data, protein_id_locations):
     produce a set of WP ids to look up in order to 'get respective sequences'
     """
     # Proper solution probably involves using a set on i, or a dictionary
+    # It would be nice to have a way to denote the 'match' proteins in each set.
     neighbor_ids = {}
     for name, pos in protein_id_locations.items():
         for i in range(pos-dist, pos):

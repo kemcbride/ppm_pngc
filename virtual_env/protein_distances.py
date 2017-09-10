@@ -17,13 +17,11 @@ from StringIO import StringIO
 from collections import defaultdict
 
 # Lists of the protein names that are PNGC or PEP_MUTASE
-from util import PPM_MATCH_LIST, PNGC_MATCH_LIST
+from util import PPM_MATCH_LIST, PNGC_MATCH_LIST, parse_lastcol
 pieces = "Complete"
 
 INPUT_PATH = '/Vagabundo/monica/temp/70-CUTGA-OUT-faa-' + pieces
-INPUT_PATH = '/home/kelly/Dropbox/gff/faa'
 GFF_PATH   = '/research/gmh/GENOME_DB/gff-' + pieces
-GFF_PATH   = '/home/kelly/Dropbox/gff/gff_files'
 LIST_PATH = 'WHEREVER THE OUTPUT TO PPM_MOTIF_FILTER IS'
 OUTFILE_COLS = ['target_name', 't_accession', 'tlen', 'query_name', 'q_accession', 'qlen', 'e_full' ]
 
@@ -46,16 +44,6 @@ def parse_motif_matches(list_path):
         wp_ids = line.split(':')[1].split(',')
         match_data[gcf_id] = wp_ids
     return match_data
-
-
-def parse_lastcol(col_text):
-    data = col_text.split(';')
-    data = [segment.split('=') for segment in data]
-    data = {segment[0]:segment[1] for segment in data}
-    # Breaking the last column of the GFF file into segments that we care about i.e. Parent=gene14
-    # So now data = {key:value for a=b;y=z} in col_text
-    # We've turned col_text into a python dictionary
-    return data
 
 
 def main(no_motif_filter=False):

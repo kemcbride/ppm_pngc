@@ -45,6 +45,16 @@ def files_remaining(idir, odir, cond=lambda x: true):
     return files
 
 
+def parse_lastcol(col_text):
+    data = col_text.split(';')
+    data = [segment.split('=') for segment in data]
+    data = {segment[0]:segment[1] for segment in data}
+    # Breaking the last column of the GFF file into segments that we care about i.e. Parent=gene14
+    # So now data = {key:value for a=b;y=z} in col_text
+    # We've turned col_text into a python dictionary
+    return data
+
+
 BLASTDB = '/research/gmh/GENOME_DB/blastpDB-Complete/GCF_{}'
 def blast_motif_match(qname):
     command = 'blastdbcmd -db ' + BLASTDB + ' -target_only -entry ' + qname + ' -outfmt %s'
