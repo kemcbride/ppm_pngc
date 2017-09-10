@@ -8,8 +8,9 @@ from __future__ import print_function
 import argparse
 import gzip
 import sys
+import os
 
-from util import ZIP_PATH, parse_faa, parse_lastcol
+from util import ZIP_PATH, parse_faa, parse_lastcol, parse_distances_file
 
 
 PATH = '/home/kelly/Dropbox/gff/gff_files'
@@ -49,11 +50,9 @@ def collect_protein_data(gcf_id, protein_ids):
                 continue # it's a comment line, ignore
 
             data = l.split('\t') # we only care about data[0], data[2], data[-1]
-            
             if data[2].lower() not in ['protein', 'cds']:
                 # possibly: gene, sequence_feature, ...
                 continue
-
             curr_protein = GFFProteinData(data)
 
             # Do this so we can instantly locate the desired proteins later
@@ -87,8 +86,57 @@ def get_respective_sequences(gcf_id, neighbor_protein_ids):
     return neighbor_seqs
 
 
-def print_product_annotations(gcf_id, protein_ids, dist):
+def produce_family_matches(gcf_id, neighbor_sequences):
+    """In order to match a 'family' to each sequence identified, we have a few steps:
+    - produce a faa file with 1 sequence contained
+    - run hmmscan --domtblout on that one sequence
+    - take the first result and get the family from that - our 'family' value
+    - delete leftover files / be careful not to waste space
+    """
+    # Use made up name for temporary direcotry - we MUST delete everything within it
+    # by the end of this function. (Just being considerate, really.)
+    output_data = {}
+    dirname = 'functions-temp/{}'.format(gcf_id)
+    os.mkdirs(dirname)
+    # Now, we want to write the fasta sequences here - one per file.
+    for pos, faa_data in neighbor_sequences.items():
+        faa_file_name = dirname + '/' + faa_data.wp + '.faa'
+        out_file_name = dirname + '/' + faa_data.wp + '.out'
+        with open(faa_file_name, 'w') as faa_file:
+            write_fasta_sequence(faa_data, output_file=faa_file)
 
+        # Now, we want to run hmmscan on each of these and - in memory, get the family id
+        run_hmmscan(faa_file_name, out_file_name)
+        family = get_family(out_file_name)
+
+        # Now we need to delete the files we've created.
+        os.remove(faa_file_name)
+        os.remove(out_file_name)
+
+        # Now, we need to create some kind of output data structure.
+        output_data[pos] = (family, faa_data)
+    os.removedirs(dirname)
+    return output_data
+
+
+def print_family_data(gcf_id, protein_ids, output_data):
+    # the style of output I want is "pos / WP / family / source(bool)"
+    print('# {} - Family Annotations'.format(gcf_id))
+    print('\t'.join(['POS', 'WP_ID', 'FAMILY', 'SOURCE']))
+    for pos, data in output_data.items():
+        # NOTE/TODO: could be nice to make the 'wp in keys' lookup constant time.
+        print('\t'.join([
+            pos,
+            data[1].wp,
+            data[0],
+            str(data[1].wp in protein_ids.keys())
+            ]))
+
+
+def print_product_annotations(gcf_id, protein_ids, dist):
+    """Unused as of now... but gets the 'product' field from a gff file
+    (we treat that as some definition of the 'function' of a gene
+    """
     protein_data, protein_id_locations = collect_protein_data(gcf_id, protein_ids)
     # Problem with how this works: produces duplicate outfit if desired proteins are within 2*dist of each other
     # cop-out solution: | sort | uniq
@@ -99,19 +147,33 @@ def print_product_annotations(gcf_id, protein_ids, dist):
             print (i, protein.name, protein.product)
 
 
+def print_gcf_family_data(gcf_id, match_data, dist):
+    # Go through the steps needed to produce output
+    # TODO/NOTE: need to use match data/match file instead of "protein_ids"
+    protein_data, protein_id_locations = collect_protein_data(gcf_id, protein_ids)
+    neighbor_protein_ids = get_neighbor_proteins(protein_data, protein_id_locations)
+    neighbor_sequences = get_respective_sequences(gcf_id, neighbor_protein_ids)
+    family_match_data = produce_family_matches(gcf_id, neighbor_sequences)
+
+    print_family_data(gcf_id, protein_id_locations, family_match_data)
+
+
+# We need a new main, that will parse out the matches PER gcf, and run our old main on each
+def main(distances_path, dist):
+    gcf_data_sets = parse_distances_file(distances_path)
+    for gcf_id, match_data in gcf_data_sets.items():
+        print_gcf_family_data(gcf_id, match_data, dist)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=
             """Prints the 'product' value for proteins surrounding given protein ids in a given GCF.
             We understand this to be some form of functional annotation.\n
             output: position | id | product
             """)
-    parser.add_argument('gcf', help='GCF identifier, eg. GCF_00024545')
-    parser.add_argument('protein_list_file', help='Path to file consisting of a list of protein ids (WP_xyz)')
+    parser.add_argument('distances_file', help='Path to distances file you want to use as input to find functions for the contained matches.')
     parser.add_argument('--dist', default=10, type=int,
             help='The distance about each to produce annotations for, eg. 10')
     args = parser.parse_args()
 
-    with open(args.protein_list_file, 'r') as plf:
-        protein_ids = [l.strip() for l in plf.readlines()]
-
-    print_annotations(args.gcf, protein_ids, args.dist)
+    main(args.distances_file, args.dist)

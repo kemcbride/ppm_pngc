@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import pandas as pd
 import gzip
@@ -26,10 +27,17 @@ MULTIPROCESSING_FACTOR = 100 # We'll run 100 per batch
 
 
 class FastaData(object):
-
     def __init__(self, wp_id, sequence_data, extra_data=''):
         self.wp = wp_id
         self.sequence = sequence_data
+        self.extra_data = extra_data
+
+
+class MatchData(object):
+    def __init__(self, left_wp_id, right_wp_id, distance, extra_data=''):
+        self.left_wp = left_wp_id
+        self.right_wp = right_wp_id
+        self.distance = distance
         self.extra_data = extra_data
 
 
@@ -92,10 +100,10 @@ def parse_faa(faa_path):
     return faa_data
 
 
-def write_fasta_sequence(fasta_data, line_length=80):
-    print('>{} {}'.format(fasta_data.wp, fasta_data.extra_data))
+def write_fasta_sequence(fasta_data, line_length=80, output_file=sys.stdout):
+    print('>{} {}'.format(fasta_data.wp, fasta_data.extra_data), file=output_file)
     for i in range(0, len(fasta_data.sequence), line_length):
-        print(fasta_data.sequence[i:i+line_length])
+        print(fasta_data.sequence[i:i+line_length], file=output_file)
 
 
 def write_fasta_sequences(gcf_id, wp_ids, fasta_path):
@@ -152,3 +160,34 @@ def get_family(out_path):
     del input_df
     target_name = first_row[0]  # Column 0 is the Target Name
     return target_name
+
+
+def parse_distances_file(distances_path):
+    with open(distances_path, 'r') as distance_file:
+        distances_raw = distance_file.readlines()
+
+    if not distances_raw[0].startswith('# '): # skip column headers, if they exist
+        distances_raw = distances_raw[1:]
+
+    # Now I want to build a dictionary of GCF_ to list of matches
+    match_data = defaultdict(set)
+    gcf_id = None
+
+    for line in distances_raw:
+        if line.startswith('#'): # comment
+            try:
+                line_data = line.split()[1:]
+            except Exception as e:
+                print("Failed to parse comment line, empty comment. Error: {}".format(e),
+                        file=sys.stderr)
+                continue
+            if line_data[0].startswith('GCF_'):
+                gcf_id = line_data[0].split('.')[0] # remove the .out from the end
+
+        else: # it's a data line
+            if gcf_id is None:
+                raise Exception("Error: Can't start adding data before finding a valid GCF id")
+            line_data = line.split()
+            match = MatchData(line_data[0], line_data[1], line_data[2], line_data[3:])
+            match_data[gcf_id].add(match)
+    return match_data
