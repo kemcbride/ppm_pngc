@@ -133,20 +133,6 @@ def print_family_data(gcf_id, protein_ids, output_data):
             ]))
 
 
-def print_product_annotations(gcf_id, protein_ids, dist):
-    """Unused as of now... but gets the 'product' field from a gff file
-    (we treat that as some definition of the 'function' of a gene
-    """
-    protein_data, protein_id_locations = collect_protein_data(gcf_id, protein_ids)
-    # Problem with how this works: produces duplicate outfit if desired proteins are within 2*dist of each other
-    # cop-out solution: | sort | uniq
-    for name, pos in protein_id_locations.items():
-        print( '# {} {}'.format(name, pos))
-        for i in range(pos-dist, pos+dist):
-            protein = protein_data[i]
-            print (i, protein.name, protein.product)
-
-
 def print_gcf_family_data(gcf_id, match_data, dist):
     # Go through the steps needed to produce output
     # TODO/NOTE: need to use match data/match file instead of "protein_ids"
