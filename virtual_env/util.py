@@ -1,5 +1,7 @@
 from __future__ import print_function
+
 import os
+import sys
 import pandas as pd
 import gzip
 
@@ -24,6 +26,10 @@ SWAG_MATCH_LIST = ['PEP_mutase', 'Choline_kinase', 'PEP-utilizers', 'PPDK_N', 'E
 HMM_FILE = '/Vagabundo/monica/Proteins/cluster_models'
 
 MULTIPROCESSING_FACTOR = 100 # We'll run 100 per batch
+
+
+class ParseError(Exception):
+    pass
 
 
 class FastaData(object):
@@ -54,12 +60,16 @@ def files_remaining(idir, odir, cond=lambda x: true):
 
 
 def parse_lastcol(col_text):
+    """ Breaking the last column of GFF file into segments eg.
+    Parent=gene14
+    data = {key:value for a=b;y=z} in col_text
+    """
     data = col_text.split(';')
-    data = [segment.split('=') for segment in data]
+    for seg in data:
+        if seg.count('=') > 1:
+            raise ParseError('Malformed lastcol string: {}'.format(col_text))
+    data = [segment.split('=') for segment in data if segment]
     data = {segment[0]:segment[1] for segment in data}
-    # Breaking the last column of the GFF file into segments that we care about i.e. Parent=gene14
-    # So now data = {key:value for a=b;y=z} in col_text
-    # We've turned col_text into a python dictionary
     return data
 
 
