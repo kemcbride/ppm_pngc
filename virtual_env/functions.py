@@ -17,6 +17,7 @@ from util import (
         parse_distances_file,
         write_fasta_sequence,
         run_hmmscan,
+        get_family,
         )
 
 
