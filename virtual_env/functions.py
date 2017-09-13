@@ -158,7 +158,7 @@ def print_gcf_family_data(gcf_id, match_data, dist):
     # TODO/NOTE: need to use match data/match file instead of "protein_ids"
     protein_data, match_locations, wp_pos_map = collect_protein_data(gcf_id, match_data)
     neighbor_ids, neighborhoods = get_neighbor_ids_and_neighborhoods(protein_data, match_locations, dist)
-    neighbor_sequences = get_respective_sequences(gcf_id, neighbor_protein_ids)
+    neighbor_sequences = get_respective_sequences(gcf_id, neighbor_ids)
     families = get_families(gcf_id, neighbor_sequences)
 
     print_family_data(gcf_id, neighborhoods, family_match_data)
