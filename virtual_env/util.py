@@ -162,7 +162,7 @@ def get_family(out_path):
     """
     # use first 2 columns, (for no apparent reason)
     # fourth column is query name, first column is target name
-    input_df = pd.read_csv(out_file,
+    input_df = pd.read_csv(out_path,
         comment='#',
         header=None,
         delimiter='\s+',
