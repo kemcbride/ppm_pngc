@@ -13,7 +13,7 @@ TEMP_PATH ='/Vagabundo/monica/temp/'
 # TEMP_PATH ='/home/kelly/Dropbox/gff/temp/'
 #OUTPUT_DIR ='CUTGA-OUT-{}'.format(DB_NAME)
 OUTPUT_DIR = 'Clusters/CUTGA-OUT-{}'.format(DB_NAME)
-ZIP_PATH = os.path.join('/research/gmh/GENOME_DB/{}', DB_NAME)
+ZIP_PATH = '/research/gmh/GENOME_DB/{}'.format(DB_NAME)
 
 # From/for sort_matches.py and protein_distances.py
 PPM_MATCH_LIST =['PEP_mutase']
