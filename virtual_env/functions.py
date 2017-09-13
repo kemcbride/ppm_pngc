@@ -13,7 +13,8 @@ import os
 from util import ZIP_PATH, parse_faa, parse_lastcol, parse_distances_file
 
 
-PATH = '/home/kelly/Dropbox/gff/gff_files'
+GFF_PATH = '/research/gmh/GENOME_DB/gff-Complete'
+
 
 
 class MatchLocation(object):
@@ -56,7 +57,7 @@ def collect_protein_data(gcf_id, match_data):
     """ rewrite
     """
     protein_data = {}
-    with gzip.open('/'.join([PATH, gcf_id]) + '.gff.gz', 'r') as f:
+    with gzip.open('/'.join([GFF_PATH, gcf_id]) + '.gff.gz', 'r') as f:
         for l in f:
             if l.startswith('#'):
                 continue # it's a comment line, ignore
@@ -91,7 +92,7 @@ def get_neighbor_ids_and_neighborhoods(protein_data, match_locations, dist):
         neighborhood = MatchNeighborhood(match_loc, dist)
         for pos in neighborhood.range:
             neighbor_ids.add(protein_data[pos].name)
-            neighborhood.ids[pos] = protein_Data[pos].name
+            neighborhood.ids[pos] = protein_data[pos].name
         match_neighborhoods.append(neighborhood)
     return neighbor_ids, match_neighborhoods
 
