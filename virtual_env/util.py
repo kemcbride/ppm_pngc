@@ -145,10 +145,12 @@ def run_hmmscan(input_path, output_path):
     @output_path: path where we will put --domtblout output
     """
 
+    DEVNULL = open('/dev/null', 'w')
     command = "/usr/local/biotools/bin/hmmscan"
     options = ['--cut_ga', '--domtblout', output_path]
     command_array = [command] + options + [HMM_FILE, input_path]
     code = call(command_array, stdout=DEVNULL)
+    DEVNULL.close()
     # TODO/NOTE: should probably raise exception if code != 0
     return code
 
