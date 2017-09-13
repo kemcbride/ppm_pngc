@@ -74,8 +74,8 @@ def collect_protein_data(gcf_id, match_data):
     for match in match_data:
         match_locations.append(MatchLocation(
             match,
-            wp_pos_map[match.left.name],
-            wp_pos_map[match.right.name]
+            wp_pos_map[match.left_wp],
+            wp_pos_map[match.right_wp]
             ))
 
     return protein_data, match_locations, wp_pos_map
@@ -146,8 +146,8 @@ def print_family_data(gcf_id, neighborhoods, family_data):
                 i,
                 data[1].wp,
                 data[0],
-                str(data[1].wp in [neighborhood.match.left.name, neighborhood.match.right.name]),
-                str(neighborhood.match.left.name + '+' + neighborhood.match.right.name),
+                str(data[1].wp in [neighborhood.match.left_wp, neighborhood.match.right_wp]),
+                str(neighborhood.match.left_wp + '+' + neighborhood.match.right_wp),
                 ]))
 
 
