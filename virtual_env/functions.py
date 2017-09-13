@@ -5,6 +5,7 @@
 
 from __future__ import print_function
 
+from subprocess import call
 import argparse
 import gzip
 import sys
