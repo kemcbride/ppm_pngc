@@ -16,6 +16,7 @@ from util import (
         parse_lastcol,
         parse_distances_file,
         write_fasta_sequence,
+        run_hmmscan,
         )
 
 
@@ -139,7 +140,8 @@ def get_families(gcf_id, neighbor_sequences):
     # by the end of this function. (Just being considerate, really.)
     output_data = {}
     dirname = 'functions-temp/{}'.format(gcf_id)
-    os.makedirs(dirname)
+    if not os.path.exists(dirname):
+        os.makedirs(dirname)
     # Now, we want to write the fasta sequences here - one per file.
     for wp_id, faa_data in neighbor_sequences.items():
         family = extract_family(dirname, faa_data)
