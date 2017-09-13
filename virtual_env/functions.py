@@ -91,8 +91,8 @@ def get_neighbor_ids_and_neighborhoods(protein_data, match_locations, dist):
     for match_loc in match_locations:
         neighborhood = MatchNeighborhood(match_loc, dist)
         for pos in neighborhood.range:
-            neighbor_ids.add(protein_data[pos].name)
-            neighborhood.ids[pos] = protein_data[pos].name
+            neighbor_ids.add(protein_data[str(pos)].name)
+            neighborhood.ids[pos] = protein_data[str(pos)].name
         match_neighborhoods.append(neighborhood)
     return neighbor_ids, match_neighborhoods
 
