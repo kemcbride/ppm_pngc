@@ -40,6 +40,7 @@ class GFFProteinData(object):
         last_col_data = parse_lastcol(row_data[-1]) # call it on the last column
 
         # It's possible that we get a 'pseudo' protein, which has no Name/protein_id
+        # TODO/NOTE: if a protein_data has '' for a name, we should wonder what's up with that...
         self.name = last_col_data.get('Name', last_col_data.get('protein_id', ''))
         # And Parent has the form 'gene12345', so we convert it to 12345
         self.parent = convert_str_int(last_col_data['Parent'])
@@ -102,7 +103,9 @@ def get_neighbor_ids_and_neighborhoods(protein_data, match_locations, dist):
 def get_respective_sequences(gcf_id, neighbor_ids):
     # We know that all sequences MUST be present in this given fasta file.
     faa_data = parse_faa('/'.join([ZIP_PATH, gcf_id+'.faa.gz']))
-    neighbor_seqs = {wp_id: faa_data[wp_id] for wp_id in neighbor_ids}
+    # TODO/NOTE: why WOULDN'T the WP id be present in the faa_data?
+    # - one case is '' protein, where we failed to find a name/WP_id
+    neighbor_seqs = {wp_id: faa_data[wp_id] for wp_id in neighbor_ids if wp_id in faa_data}
     return neighbor_seqs
 
 
