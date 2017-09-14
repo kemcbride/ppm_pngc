@@ -66,9 +66,7 @@ def convert_str_int(string):
     return int(filtered)
 
 
-def collect_protein_data(gcf_id, match_data):
-    """ rewrite
-    """
+def collect_protein_data(gcf_id, match_data, max_dist):
     protein_data = {}
     with gzip.open('/'.join([GFF_PATH, gcf_id]) + '.gff.gz', 'r') as f:
         for l in f:
@@ -86,6 +84,9 @@ def collect_protein_data(gcf_id, match_data):
 
     match_locations = []
     for match in match_data:
+        if match.distance > max_dist:
+            continue
+
         match_locations.append(MatchLocation(
             match,
             wp_pos_map[match.left_wp],
@@ -168,8 +169,8 @@ def print_family_data(gcf_id, neighborhoods, family_data):
                     ]))
 
 
-def print_gcf_family_data(gcf_id, match_data, dist, fill_between):
-    protein_data, match_locations, wp_pos_map = collect_protein_data(gcf_id, match_data)
+def print_gcf_family_data(gcf_id, match_data, dist, max_dist, fill_between):
+    protein_data, match_locations, wp_pos_map = collect_protein_data(gcf_id, match_data, max_dist)
     neighbor_ids, neighborhoods = get_neighbor_ids_and_neighborhoods(
             protein_data, match_locations, dist, fill_between)
     neighbor_sequences = get_respective_sequences(gcf_id, neighbor_ids)
@@ -178,11 +179,11 @@ def print_gcf_family_data(gcf_id, match_data, dist, fill_between):
     print_family_data(gcf_id, neighborhoods, families)
 
 
-def main(distances_path, dist, fill_between):
+def main(distances_path, dist, max_dist, fill_between):
     gcf_data_sets = parse_distances_file(distances_path)
     print('\t'.join(['GCF', 'POS', 'WP_ID', 'FAMILY', 'SOURCE', 'MATCH_NEIGHBORHOOD']))
     for gcf_id, match_data in gcf_data_sets.items():
-        print_gcf_family_data(gcf_id, match_data, dist, fill_between)
+        print_gcf_family_data(gcf_id, match_data, dist, max_dist, fill_between)
 
 
 if __name__ == '__main__':
@@ -194,8 +195,10 @@ if __name__ == '__main__':
     parser.add_argument('distances_file', help='Path to distances file you want to use as input to find functions for the contained matches.')
     parser.add_argument('--dist', default=10, type=int,
             help='The distance about each to produce annotations for, eg. 10')
+    parser.add_argument('--max_dist', default=sys.maxint, type=int,
+            help='The max distance to allow passage through this analysis (eg. 10)')
     parser.add_argument('--fill_between', action='store_true',
             help='Whether or not to include all genes between a match or just dist range on either side.')
     args = parser.parse_args()
 
-    main(args.distances_file, args.dist, args.fill_between)
+    main(args.distances_file, args.dist, args.max_dist, args.fill_between)
