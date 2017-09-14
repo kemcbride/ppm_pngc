@@ -26,6 +26,7 @@ SWAG_MATCH_LIST = ['PEP_mutase', 'Choline_kinase', 'PEP-utilizers', 'PPDK_N', 'E
 
 #HMM_FILE = '/Vagabundo/monica/Proteins/models.hmm'
 HMM_FILE = '/Vagabundo/monica/Proteins/cluster_models'
+PFAM_DB = '/Vagabundo/monica/Proteins/Pfam-A.hmm'
 
 MULTIPROCESSING_FACTOR = 100 # We'll run 100 per batch
 
@@ -138,7 +139,7 @@ def write_fasta_sequences(gcf_id, wp_ids, fasta_path):
         write_fasta_sequence(fasta_data)
 
 
-def run_hmmscan(input_path, output_path):
+def run_hmmscan(input_path, output_path, model_db_file=PFAM_DB):
     """
     Run hmmscan on a given input (.faa) file, get output (.out) at output_path
     @input_path: must point to a valid fasta file (UNZIPPED/RAW)
@@ -148,7 +149,7 @@ def run_hmmscan(input_path, output_path):
     DEVNULL = open('/dev/null', 'w')
     command = "/usr/local/biotools/bin/hmmscan"
     options = ['--cut_ga', '--domtblout', output_path]
-    command_array = [command] + options + [HMM_FILE, input_path]
+    command_array = [command] + options + [model_db_file, input_path]
     code = call(command_array, stdout=DEVNULL)
     DEVNULL.close()
     # TODO/NOTE: should probably raise exception if code != 0
