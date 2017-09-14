@@ -33,13 +33,20 @@ class MatchLocation(object):
 
 
 class MatchNeighborhood(object):
-    def __init__(self, match_loc, dist):
+    def __init__(self, match_loc, dist, fill_between=True):
         self.match_loc = match_loc
         self.dist = dist
         if match_loc.left_pos < match_loc.right_pos:
-            self.range = range(match_loc.left_pos - dist, match_loc.right_pos + dist)
+            top = match_loc.right_pos
+            bottom = match_loc.left_pos
         else:
-            self.range = range(match_loc.right_pos - dist, match_loc.left_pos + dist)
+            top = match_loc.left_pos
+            bottom = match_loc.right_pos
+
+        if fill_between or abs(top - bottom) < dist:
+            self.range = range(bottom - dist, top + dist)
+        else:
+            self.range = range(bottom - dist, bottom + dist) + range(top - dist, top + dist)
         self.ids = {} # structure:  pos : id
 
 
@@ -91,14 +98,14 @@ def collect_protein_data(gcf_id, match_data):
     return protein_data, match_locations, wp_pos_map
 
 
-def get_neighbor_ids_and_neighborhoods(protein_data, match_locations, dist):
+def get_neighbor_ids_and_neighborhoods(protein_data, match_locations, dist, fill_between):
     """Given protein data and relevant id locations,
     produce a set of WP ids to look up in order to 'get respective sequences'
     """
     match_neighborhoods = []
     neighbor_ids = set()
     for match_loc in match_locations:
-        neighborhood = MatchNeighborhood(match_loc, dist)
+        neighborhood = MatchNeighborhood(match_loc, dist, fill_between=fill_between)
 
         for pos in neighborhood.range:
             if pos in protein_data:
@@ -161,15 +168,16 @@ def print_family_data(gcf_id, neighborhoods, family_data):
                 i,
                 data[1].wp,
                 data[0],
-                str(data[1].wp in [neighborhood.match.left_wp, neighborhood.match.right_wp]),
-                str(neighborhood.match.left_wp + '+' + neighborhood.match.right_wp),
+                str(data[1].wp in [neighborhood.match_loc.match.left_wp, neighborhood.match_loc.match.right_wp]),
+                str(neighborhood.match_loc.match.left_wp + '+' + neighborhood.match_loc.match.right_wp),
                 ]))
 
 
-def print_gcf_family_data(gcf_id, match_data, dist):
+def print_gcf_family_data(gcf_id, match_data, dist, fill_between):
     # TODO/NOTE: need to use match data/match file instead of "protein_ids"
     protein_data, match_locations, wp_pos_map = collect_protein_data(gcf_id, match_data)
-    neighbor_ids, neighborhoods = get_neighbor_ids_and_neighborhoods(protein_data, match_locations, dist)
+    neighbor_ids, neighborhoods = get_neighbor_ids_and_neighborhoods(
+            protein_data, match_locations, dist, fill_between)
     neighbor_sequences = get_respective_sequences(gcf_id, neighbor_ids)
     families = get_families(gcf_id, neighbor_sequences)
 
@@ -177,10 +185,10 @@ def print_gcf_family_data(gcf_id, match_data, dist):
 
 
 # We need a new main, that will parse out the matches PER gcf, and run our old main on each
-def main(distances_path, dist):
+def main(distances_path, dist, fill_between):
     gcf_data_sets = parse_distances_file(distances_path)
     for gcf_id, match_data in gcf_data_sets.items():
-        print_gcf_family_data(gcf_id, match_data, dist)
+        print_gcf_family_data(gcf_id, match_data, dist, fill_between)
 
 
 if __name__ == '__main__':
@@ -192,6 +200,8 @@ if __name__ == '__main__':
     parser.add_argument('distances_file', help='Path to distances file you want to use as input to find functions for the contained matches.')
     parser.add_argument('--dist', default=10, type=int,
             help='The distance about each to produce annotations for, eg. 10')
+    parser.add_argument('--fill_between', action='store_true',
+            help='Whether or not to include all genes between a match or just dist range on either side.')
     args = parser.parse_args()
 
-    main(args.distances_file, args.dist)
+    main(args.distances_file, args.dist, args.fill_between)
