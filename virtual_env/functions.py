@@ -172,7 +172,7 @@ def print_family_data(gcf_id, neighborhoods, family_data):
                     wp_id,
                     family_datum[0],
                     str(wp_id in [neighborhood.match_loc.match.left_wp, neighborhood.match_loc.match.right_wp]),
-                    str(neighborhood.match_loc.match.left_wp + '+' + neighborhood.match_loc.match.right_wp),
+                    str(neighborhood.match_loc.match.left_wp) + '+' + str(neighborhood.match_loc.match.right_wp),
                     ]))
 
 
