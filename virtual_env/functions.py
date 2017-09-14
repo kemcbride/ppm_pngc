@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 
-# 
-# 
-
 from __future__ import print_function
 
 import argparse
@@ -130,11 +127,9 @@ def extract_family(dirname, faa_data):
     with open(faa_file_name, 'w') as faa_file:
         write_fasta_sequence(faa_data, output_file=faa_file)
 
-    # Now, we want to run hmmscan on each of these and - in memory, get the family id
     run_hmmscan(faa_file_name, out_file_name)
     family = get_family(out_file_name)
 
-    # Now we need to delete the files we've created.
     os.remove(faa_file_name)
     os.remove(out_file_name)
     return family
@@ -144,13 +139,11 @@ def get_families(gcf_id, neighbor_sequences):
     """Use extract_family to match up WP_ids to their respective
     families via hmmscan
     """
-    # Use made up name for temporary direcotry - we MUST delete everything within it
-    # by the end of this function. (Just being considerate, really.)
     output_data = {}
     dirname = 'functions-temp/{}'.format(gcf_id)
     if not os.path.exists(dirname):
         os.makedirs(dirname)
-    # Now, we want to write the fasta sequences here - one per file.
+
     for wp_id, faa_data in neighbor_sequences.items():
         family = extract_family(dirname, faa_data)
         output_data[wp_id] = (family, faa_data)
@@ -160,7 +153,6 @@ def get_families(gcf_id, neighbor_sequences):
 
 def print_family_data(gcf_id, neighborhoods, family_data):
     # the style of output I want is "GCF / pos / WP / family / source(bool) / match_id"
-    print('\t'.join(['GCF', 'POS', 'WP_ID', 'FAMILY', 'SOURCE', 'MATCH_NEIGHBORHOOD']))
     for neighborhood in neighborhoods:
         for i in neighborhood.range:
             if i in neighborhood.ids:
@@ -177,7 +169,6 @@ def print_family_data(gcf_id, neighborhoods, family_data):
 
 
 def print_gcf_family_data(gcf_id, match_data, dist, fill_between):
-    # TODO/NOTE: need to use match data/match file instead of "protein_ids"
     protein_data, match_locations, wp_pos_map = collect_protein_data(gcf_id, match_data)
     neighbor_ids, neighborhoods = get_neighbor_ids_and_neighborhoods(
             protein_data, match_locations, dist, fill_between)
@@ -187,9 +178,9 @@ def print_gcf_family_data(gcf_id, match_data, dist, fill_between):
     print_family_data(gcf_id, neighborhoods, families)
 
 
-# We need a new main, that will parse out the matches PER gcf, and run our old main on each
 def main(distances_path, dist, fill_between):
     gcf_data_sets = parse_distances_file(distances_path)
+    print('\t'.join(['GCF', 'POS', 'WP_ID', 'FAMILY', 'SOURCE', 'MATCH_NEIGHBORHOOD']))
     for gcf_id, match_data in gcf_data_sets.items():
         print_gcf_family_data(gcf_id, match_data, dist, fill_between)
 
