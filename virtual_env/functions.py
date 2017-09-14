@@ -108,7 +108,7 @@ def get_neighbor_ids_and_neighborhoods(protein_data, match_locations, dist, fill
         neighborhood = MatchNeighborhood(match_loc, dist, fill_between=fill_between)
 
         for pos in neighborhood.range:
-            if pos in protein_data:
+            if pos in protein_data and protein_data[pos].name:
                 neighbor_ids.add(protein_data[pos].name)
                 neighborhood.ids[pos] = protein_data[pos].name
         match_neighborhoods.append(neighborhood)
