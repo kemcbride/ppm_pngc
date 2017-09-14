@@ -33,7 +33,7 @@ class MatchLocation(object):
 
 
 class MatchNeighborhood(object):
-    def __init__(self, match_loc, dist, fill_between=True):
+    def __init__(self, match_loc, dist, fill_between=False):
         self.match_loc = match_loc
         self.dist = dist
         if match_loc.left_pos < match_loc.right_pos:
