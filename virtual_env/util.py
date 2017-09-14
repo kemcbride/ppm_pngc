@@ -163,15 +163,17 @@ def get_family(out_path):
     """
     # use first 2 columns, (for no apparent reason)
     # fourth column is query name, first column is target name
-    input_df = pd.read_csv(out_path,
-        comment='#',
-        header=None,
-        delimiter='\s+',
-        usecols=range(2)
-        )
-    first_row = input_df.loc[0].values
+    try:
+        input_df = pd.read_csv(out_path,
+            comment='#',
+            header=None,
+            delimiter='\s+',
+            usecols=range(2)
+            )
+        first_row = input_df.loc[0].values
+    except pd.io.common.EmptyDataError:
+        return 'HYPOTHETICAL'
 
-    del input_df
     target_name = first_row[0]  # Column 0 is the Target Name
     return target_name
 
