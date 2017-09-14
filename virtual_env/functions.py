@@ -84,8 +84,6 @@ def collect_protein_data(gcf_id, match_data, max_dist):
 
     match_locations = []
     for match in match_data:
-        if match.distance > max_dist:
-            continue
 
         match_locations.append(MatchLocation(
             match,
