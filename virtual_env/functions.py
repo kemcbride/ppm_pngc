@@ -184,7 +184,7 @@ def print_gcf_family_data(gcf_id, match_data, dist, fill_between):
     neighbor_sequences = get_respective_sequences(gcf_id, neighbor_ids)
     families = get_families(gcf_id, neighbor_sequences)
 
-    print_family_data(gcf_id, neighborhoods, family_match_data)
+    print_family_data(gcf_id, neighborhoods, families)
 
 
 # We need a new main, that will parse out the matches PER gcf, and run our old main on each
