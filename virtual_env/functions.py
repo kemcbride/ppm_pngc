@@ -168,7 +168,7 @@ def print_family_data(gcf_id, neighborhoods, family_data):
                 family_datum = family_data[wp_id]
                 print('\t'.join([
                     gcf_id,
-                    i,
+                    str(i),
                     wp_id,
                     family_datum[0],
                     str(wp_id in [neighborhood.match_loc.match.left_wp, neighborhood.match_loc.match.right_wp]),
