@@ -146,7 +146,7 @@ def get_families(gcf_id, neighbor_sequences):
     # Now, we want to write the fasta sequences here - one per file.
     for wp_id, faa_data in neighbor_sequences.items():
         family = extract_family(dirname, faa_data)
-        output_data[wp_id] = (family, faa_data)
+        output_data[pos] = (family, faa_data)
     os.removedirs(dirname)
     return output_data
 
@@ -156,17 +156,14 @@ def print_family_data(gcf_id, neighborhoods, family_data):
     print('\t'.join(['GCF', 'POS', 'WP_ID', 'FAMILY', 'SOURCE', 'MATCH_NEIGHBORHOOD']))
     for neighborhood in neighborhoods:
         for i in neighborhood.range:
-            if i in neighborhood.ids:
-                wp = neighborhood.ids[i]
-                family_datum = family_data[wp]
-                print('\t'.join([
-                    gcf_id,
-                    i,
-                    wp,
-                    family_datum[0], # family
-                    str(wp in [neighborhood.match.left_wp, neighborhood.match.right_wp]),
-                    str(neighborhood.match.left_wp + '+' + neighborhood.match.right_wp),
-                    ]))
+            print('\t'.join([
+                gcf_id,
+                i,
+                data[1].wp,
+                data[0],
+                str(data[1].wp in [neighborhood.match.left_wp, neighborhood.match.right_wp]),
+                str(neighborhood.match.left_wp + '+' + neighborhood.match.right_wp),
+                ]))
 
 
 def print_gcf_family_data(gcf_id, match_data, dist):
@@ -176,7 +173,7 @@ def print_gcf_family_data(gcf_id, match_data, dist):
     neighbor_sequences = get_respective_sequences(gcf_id, neighbor_ids)
     families = get_families(gcf_id, neighbor_sequences)
 
-    print_family_data(gcf_id, neighborhoods, families)
+    print_family_data(gcf_id, neighborhoods, family_match_data)
 
 
 # We need a new main, that will parse out the matches PER gcf, and run our old main on each
