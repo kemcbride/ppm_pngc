@@ -16,6 +16,8 @@ TEMP_PATH ='/Vagabundo/monica/temp/'
 OUTPUT_DIR = 'Clusters/CUTGA-OUT-{}'.format(DB_NAME)
 ZIP_PATH = '/research/gmh/GENOME_DB/{}'.format(DB_NAME)
 
+TAXONOMY_MAP_PATH = 'CompleteTaxid.yml'
+
 # From/for sort_matches.py and protein_distances.py
 PPM_MATCH_LIST =['PEP_mutase']
 PNGC_MATCH_LIST =['NTP_transferase', 'NTP_transf_3', 'IspD']
@@ -119,7 +121,7 @@ def write_fasta_sequence(fasta_data, line_length=80, output_file=sys.stdout):
         print(fasta_data.sequence[i:i+line_length], file=output_file)
 
 
-def write_fasta_sequences(gcf_id, wp_ids, fasta_path):
+def write_fasta_sequences(gcf_id, wp_ids, fasta_path, taxonomy=False):
     try:
         faa_data = parse_faa('/'.join([fasta_path, gcf_id+'.faa.gz']))
     except IOError as e:
@@ -128,6 +130,12 @@ def write_fasta_sequences(gcf_id, wp_ids, fasta_path):
         except IOError as e:
             print('# IOError: (write_fasta_sequences) {}'.format(e))
             return
+
+    if taxonomy:
+        with open(TAXONOMY_MAP_PATH, 'r') as tm_path:
+            taxid_map = yaml.load(tm_path)
+        for k, v in faa_data:
+            v.extra_data = taxid_map.get(gcf_id, 'NOT_FOUND')
 
     for wp_id in wp_ids:
         try:
