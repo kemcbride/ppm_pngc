@@ -45,7 +45,6 @@ def get_outfile_data(outfile_path, valid_target_names):
 
     del input_df
     valid_query_names = valid_rows['query_name'].unique()
-    print('Hello! {} '.format(valid_query_names))
 
     # Now I want to build a dictionary of GCF_ to list of WP_ ids.
     wp_dict = {gcf_id: set(valid_query_names)}
