@@ -134,7 +134,7 @@ def write_fasta_sequences(gcf_id, wp_ids, fasta_path, taxonomy=False):
     if taxonomy:
         with open(TAXONOMY_MAP_PATH, 'r') as tm_path:
             taxid_map = yaml.load(tm_path)
-        for k, v in faa_data:
+        for k, v in faa_data.items():
             v.extra_data = taxid_map.get(gcf_id, 'NOT_FOUND')
 
     for wp_id in wp_ids:
