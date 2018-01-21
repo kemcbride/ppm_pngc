@@ -4,7 +4,7 @@ from util import parse_faa
 
 database = "Complete"
 
-FAA_PATH = '/research/gmh/GENOME-DB/faa-' + database
+FAA_PATH = '/research/gmh/GENOME_DB/faa-' + database
 INPUT_PATH = '/Vagabundo/monica/temp/70-CUTGA-OUT-faa-' + database
 
 MOTIF_REGEX = 'EDK\w{3,7}NS'
