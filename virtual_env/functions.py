@@ -21,7 +21,6 @@ from util import (
 GFF_PATH = '/research/gmh/GENOME_DB/gff-Complete'
 
 
-
 class MatchLocation(object):
     def __init__(self, match, left_pos, right_pos):
         self.match = match
@@ -84,6 +83,11 @@ def collect_protein_data(gcf_id, match_data, max_dist):
 
     match_locations = []
     for match in match_data:
+
+        if match.length > max_dist:
+            # this code will cause us to actually use max_dist - and skip
+            # matches that are too far apart.
+            continue
 
         match_locations.append(MatchLocation(
             match,
@@ -192,9 +196,9 @@ if __name__ == '__main__':
             """)
     parser.add_argument('distances_file', help='Path to distances file you want to use as input to find functions for the contained matches.')
     parser.add_argument('--dist', default=10, type=int,
-            help='The distance about each to produce annotations for, eg. 10')
+            help='The distance about each to produce annotations for')
     parser.add_argument('--max_dist', default=sys.maxint, type=int,
-            help='The max distance to allow passage through this analysis (eg. 10)')
+            help='The max distance to allow passage through this analysis')
     parser.add_argument('--fill_between', action='store_true',
             help='Whether or not to include all genes between a match or just dist range on either side.')
     args = parser.parse_args()
