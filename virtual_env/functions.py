@@ -66,21 +66,6 @@ def convert_str_int(string):
 
 
 def collect_protein_data(gcf_id, match_data, max_dist):
-    protein_data = {}
-    with gzip.open('/'.join([GFF_PATH, gcf_id]) + '.gff.gz', 'r') as f:
-        for l in f:
-            if l.startswith('#'):
-                continue # it's a comment line, ignore
-
-            data = l.split('\t') # we only care about data[0], data[2], data[-1]
-            if data[2].lower() not in ['protein', 'cds']:
-                # possibly: gene, sequence_feature, ...
-                continue
-            curr_protein = GFFProteinData(data)
-            protein_data[curr_protein.parent] = curr_protein
-
-    wp_pos_map = {protein.name: protein.parent for _, protein in protein_data.items()}
-
     match_locations = []
     for match in match_data:
 
@@ -94,6 +79,24 @@ def collect_protein_data(gcf_id, match_data, max_dist):
             wp_pos_map[match.left_wp],
             wp_pos_map[match.right_wp]
             ))
+
+    protein_data = {}
+    if match_locations: # ie. if there are any valid matches for this GCF,
+        with gzip.open('/'.join([GFF_PATH, gcf_id]) + '.gff.gz', 'r') as f:
+            for l in f:
+                if l.startswith('#'):
+                    continue # it's a comment line, ignore
+
+                data = l.split('\t') # we only care about data[0], data[2], data[-1]
+                if data[2].lower() not in ['protein', 'cds']:
+                    # possibly: gene, sequence_feature, ...
+                    continue
+                curr_protein = GFFProteinData(data)
+                protein_data[curr_protein.parent] = curr_protein
+
+        wp_pos_map = {protein.name: protein.parent for _, protein in protein_data.items()}
+    else:
+        wp_pos_map = {}
 
     return protein_data, match_locations, wp_pos_map
 
