@@ -84,7 +84,7 @@ def collect_protein_data(gcf_id, match_data, max_dist):
     match_locations = []
     for match in match_data:
 
-        if match.length > max_dist:
+        if match.distance > max_dist:
             # this code will cause us to actually use max_dist - and skip
             # matches that are too far apart.
             continue
