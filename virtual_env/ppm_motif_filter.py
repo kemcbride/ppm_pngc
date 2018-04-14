@@ -28,12 +28,12 @@ def file_has_motif(faa_path, motif_regex):
     try:
         if faa_path.endswith('.gz'):
             with gzip.open(faa_path, 'r') as f:
-                file_contents = str(f.read())
+                file_contents = bytes(str(f.read()), 'utf-8')
         else:
             with open(faa_path, 'r') as f:
                 file_contents = f.read()
         
-        has_motif = bool(re.search(str(motif_regex), file_contents))
+        has_motif = bool(re.search(motif_regex, file_contents))
         return has_motif
     except Exception as e:
         print('# ERROR {}: {}'.format(e, faa_path))
