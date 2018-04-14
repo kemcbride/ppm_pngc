@@ -55,4 +55,4 @@ if __name__ == '__main__':
             for wp_id, fasta_data in faa_sequences.iteritems():
                 if has_motif(fasta_data.sequence, MOTIF_REGEX):
                     matching_wps.append(wp_id)
-            print gcf_id + ':' + ','.join(matching_wps)
+            print(gcf_id + ':' + ','.join(matching_wps))
