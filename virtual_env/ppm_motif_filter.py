@@ -1,4 +1,5 @@
 import os, re
+import gzip
 
 from util import parse_faa
 
