@@ -24,10 +24,13 @@ def has_motif(content_string, motif_regex):
 
 
 def file_has_motif(faa_path, motif_regex):
-    with open(faa_path, 'r') as f:
-        file_contents = f.read()
-    has_motif = bool(re.search(motif_regex, file_contents))
-    return has_motif
+    try:
+        with open(faa_path, 'r') as f:
+            file_contents = f.read()
+        has_motif = bool(re.search(motif_regex, file_contents))
+        return has_motif
+    except Exception:
+        return False
 
 
 if __name__ == '__main__':
