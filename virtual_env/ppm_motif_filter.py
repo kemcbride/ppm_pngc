@@ -28,7 +28,7 @@ def file_has_motif(faa_path, motif_regex):
     try:
         if faa_path.endswith('.gz'):
             with gzip.open(faa_path, 'r') as f:
-                file_contents = str(f.read())
+                file_contents = bytes(str(f.read()))
         else:
             with open(faa_path, 'r') as f:
                 file_contents = f.read()
