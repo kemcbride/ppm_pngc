@@ -34,8 +34,8 @@ def file_has_motif(faa_path, motif_regex):
         
         has_motif = bool(re.search(motif_regex, file_contents))
         return has_motif
-    except Exception:
-        print('# File not found: {}'.format(faa_path))
+    except Exception as e:
+        print('# ERROR {}: {}'.format(e, faa_path))
         return False
 
 
