@@ -25,11 +25,17 @@ def has_motif(content_string, motif_regex):
 
 def file_has_motif(faa_path, motif_regex):
     try:
-        with open(faa_path, 'r') as f:
-            file_contents = f.read()
+        if faa_path.endswith('.gz'):
+            with gzip.open(faa_path, 'r') as f:
+                file_contents = f.read()
+        else:
+            with open(faa_path, 'r') as f:
+                file_contents = f.read()
+        
         has_motif = bool(re.search(motif_regex, file_contents))
         return has_motif
     except Exception:
+        print('# File not found: {}'.format(faa_path))
         return False
 
 
