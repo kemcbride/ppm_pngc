@@ -93,8 +93,7 @@ def parse_faa(faa_path):
     else:
         with open(faa_path, 'r') as f:
             file_contents = f.read()
-    file_contents = str(file_contents)
-    raw_sequence_list = file_contents.split('>')
+    raw_sequence_list = file_contents.split(b'>')
 
     del file_contents # Save memory! Helps the computer run better!
 
