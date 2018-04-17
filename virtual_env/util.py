@@ -141,7 +141,7 @@ def write_fasta_sequences(gcf_id, wp_ids, fasta_path, taxonomy=False):
         try:
             fasta_data = faa_data[wp_id]
         except KeyError as e:
-            print('# KeyError: (write_fasta_sequences) {}'.format(e))
+            print('# KeyError: (write_fasta_sequences) {}'.format(e, gcf_id))
             return
 
         write_fasta_sequence(fasta_data)
