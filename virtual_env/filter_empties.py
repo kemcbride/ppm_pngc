@@ -32,7 +32,7 @@ def main():
     for filename in os.listdir(OUTPUTPATH.format(SETNAME)):
         filepath = os.path.join(OUTPUTPATH.format(SETNAME), filename)
         determine_empty(filepath)
-    print "Deleted {} empty files, for set {}".format(count, SETNAME)
+    print ("Deleted {} empty files, for set {}".format(count, SETNAME))
 
 if __name__ == '__main__':
     main()
