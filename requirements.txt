@@ -28,7 +28,7 @@ pyparsing==2.1.1
 python-dateutil==2.2
 pytz==2014.2
 pyzmq==15.0.0
-reportlab==2.5
+reportlab==3.5.55
 scipy==0.18.0
 six==1.10.0
 tables==3.2.2
